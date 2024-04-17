@@ -4,6 +4,11 @@ export const useUserStore = defineStore('user', () => {
   /**
    * Current named of the user.
    */
+  const listedFlights = ref([])
+  const savedKey = ref('')
+  const inputKey = ref('')
+  const inputFlight = ref('')
+  const trackedFlights = ref([])
   const savedName = ref('')
   const previousNames = ref(new Set<string>())
 
@@ -27,6 +32,11 @@ export const useUserStore = defineStore('user', () => {
     setNewName,
     otherNames,
     savedName,
+    savedKey,
+    trackedFlights,
+    inputKey,
+    inputFlight,
+    listedFlights,
   }
 })
 
