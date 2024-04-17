@@ -6,7 +6,7 @@ defineOptions({
 })
 // const { t } = useI18n()
 const date = new Date()
-const date_string = date.toString() // .replace(/T/, ':').replace(/\.\w*/, '')
+// const date_string = date.toString() // .replace(/T/, ':').replace(/\.\w*/, '')
 const year = date.getFullYear().toString()
 const month = `0${date.getMonth() + 1}`.slice(-2)
 const day = `0${date.getDate().toString()}`.slice(-2)
@@ -82,9 +82,9 @@ function addFlight() {
 }
 user.listedFlights = []
 
-function go_home() {
-  router.push('/')
-}
+// function go_home() {
+//   router.push('/')
+// }
 // `0${date.getDate().toString()}`.slice(-2)
 // const filtered_flight = new Date(respond_1.result.response.data[1].time.scheduled.arrival * 1000).getDate()
 // const filtered_flight = respond_1.result.response.data[1].time.scheduled.arrival
