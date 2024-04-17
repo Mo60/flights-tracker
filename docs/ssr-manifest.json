@@ -1,0 +1,321 @@
+{
+  "\u0000C:/Users/mokha/projects/Mo60.github.io/node_modules/.pnpm/nprogress@0.2.0/node_modules/nprogress/nprogress.js?commonjs-module": [
+  ],
+  "\u0000commonjsHelpers.js": [
+  ],
+  "\u0000plugin-vue:export-helper": [
+  ],
+  "\u0000vite/modulepreload-polyfill": [
+  ],
+  "\u0000vite/preload-helper": [
+  ],
+  "../../../../@vite-plugin-pages/generated-pages?id=~pages": [
+  ],
+  "../../../../@vite-plugin-pages/route-block": [
+  ],
+  "../../../../@vite-plugin-pwa/virtual:pwa-register": [
+    "/assets/virtual_pwa-register-7897c40a.js"
+  ],
+  "../../../../@vite-plugin-vue-layouts/generated-layouts": [
+  ],
+  "../../../../__uno.css": [
+  ],
+  "../../../../vue-macros/define-models/use-vmodel": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "assets/app-!~{001}~.js-unocss-hash.css": [
+  ],
+  "index.html": [
+  ],
+  "locales/ar.yml": [
+    "/assets/ar-0eb78e82.js"
+  ],
+  "locales/de.yml": [
+    "/assets/de-1d048ed8.js"
+  ],
+  "locales/en.yml": [
+    "/assets/en-58641bd2.js"
+  ],
+  "locales/es.yml": [
+    "/assets/es-695014b3.js"
+  ],
+  "locales/fr.yml": [
+    "/assets/fr-dac7f002.js"
+  ],
+  "locales/id.yml": [
+    "/assets/id-96d44a7c.js"
+  ],
+  "locales/it.yml": [
+    "/assets/it-722f4f77.js"
+  ],
+  "locales/ja.yml": [
+    "/assets/ja-357ab22b.js"
+  ],
+  "locales/ka.yml": [
+    "/assets/ka-cc514cb9.js"
+  ],
+  "locales/ko.yml": [
+    "/assets/ko-31fd6682.js"
+  ],
+  "locales/pl.yml": [
+    "/assets/pl-b4d08f74.js"
+  ],
+  "locales/pt-BR.yml": [
+    "/assets/pt-BR-e5840fd8.js"
+  ],
+  "locales/ru.yml": [
+    "/assets/ru-1f9df64c.js"
+  ],
+  "locales/tr.yml": [
+    "/assets/tr-c2f43110.js"
+  ],
+  "locales/uk.yml": [
+    "/assets/uk-9a65a31a.js"
+  ],
+  "locales/uz.yml": [
+    "/assets/uz-629fed99.js"
+  ],
+  "locales/vi.yml": [
+    "/assets/vi-6fb840cb.js"
+  ],
+  "locales/zh-CN.yml": [
+    "/assets/zh-CN-78ecf232.js"
+  ],
+  "node_modules/.pnpm/@intlify+core-base@9.2.2/node_modules/@intlify/core-base/dist/core-base.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/@intlify+devtools-if@9.2.2/node_modules/@intlify/devtools-if/dist/devtools-if.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/@intlify+message-compiler@9.2.2/node_modules/@intlify/message-compiler/dist/message-compiler.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/@intlify+shared@9.2.2/node_modules/@intlify/shared/dist/shared.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/@unhead+dom@1.1.34/node_modules/@unhead/dom/dist/index.mjs": [
+  ],
+  "node_modules/.pnpm/@unhead+shared@1.1.34/node_modules/@unhead/shared/dist/index.mjs": [
+  ],
+  "node_modules/.pnpm/@unhead+vue@1.1.34_vue@3.3.4/node_modules/@unhead/vue/dist/shared/vue.505b826e.mjs": [
+  ],
+  "node_modules/.pnpm/@unocss+reset@0.53.6/node_modules/@unocss/reset/tailwind.css": [
+  ],
+  "node_modules/.pnpm/@vue+reactivity@3.3.4/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/@vue+runtime-core@3.3.4/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/@vue+runtime-dom@3.3.4/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/@vue+shared@3.3.4/node_modules/@vue/shared/dist/shared.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/@vueuse+core@10.3.0_vue@3.3.4/node_modules/@vueuse/core/index.mjs": [
+  ],
+  "node_modules/.pnpm/@vueuse+shared@10.3.0_vue@3.3.4/node_modules/@vueuse/shared/index.mjs": [
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/adapters/adapters.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/adapters/xhr.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/axios.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/cancel/CancelToken.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/cancel/CanceledError.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/cancel/isCancel.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/Axios.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/AxiosError.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/AxiosHeaders.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/InterceptorManager.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/buildFullPath.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/dispatchRequest.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/mergeConfig.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/settle.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/core/transformData.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/defaults/index.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/defaults/transitional.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/env/data.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/AxiosURLSearchParams.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/HttpStatusCode.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/bind.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/buildURL.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/combineURLs.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/cookies.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/formDataToJSON.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/isAbsoluteURL.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/isAxiosError.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/isURLSameOrigin.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/null.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/parseHeaders.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/parseProtocol.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/speedometer.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/spread.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/toFormData.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/toURLEncodedForm.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/helpers/validator.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/platform/browser/classes/Blob.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/platform/browser/classes/FormData.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/platform/browser/classes/URLSearchParams.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/platform/browser/index.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/axios@1.4.0/node_modules/axios/lib/utils.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "node_modules/.pnpm/hookable@5.5.3/node_modules/hookable/dist/index.mjs": [
+  ],
+  "node_modules/.pnpm/nprogress@0.2.0/node_modules/nprogress/nprogress.js": [
+  ],
+  "node_modules/.pnpm/pinia@2.1.6_typescript@5.1.6+vue@3.3.4/node_modules/pinia/dist/pinia.mjs": [
+  ],
+  "node_modules/.pnpm/unhead@1.1.34/node_modules/unhead/dist/index.mjs": [
+  ],
+  "node_modules/.pnpm/vite-ssg@0.23.1_aohdkldbdasf3pz7kvvd6saode/node_modules/vite-ssg/dist/index.mjs": [
+  ],
+  "node_modules/.pnpm/vite-ssg@0.23.1_aohdkldbdasf3pz7kvvd6saode/node_modules/vite-ssg/dist/shared/vite-ssg.5912142e.mjs": [
+  ],
+  "node_modules/.pnpm/vite-ssg@0.23.1_aohdkldbdasf3pz7kvvd6saode/node_modules/vite-ssg/dist/shared/vite-ssg.a009fbf1.mjs": [
+  ],
+  "node_modules/.pnpm/vue-demi@0.14.5_vue@3.3.4/node_modules/vue-demi/lib/index.mjs": [
+  ],
+  "node_modules/.pnpm/vue-i18n@9.2.2_vue@3.3.4/node_modules/vue-i18n/dist/vue-i18n.runtime.esm-bundler.js": [
+  ],
+  "node_modules/.pnpm/vue-router@4.2.4_vue@3.3.4/node_modules/vue-router/dist/vue-router.mjs": [
+  ],
+  "node_modules/.pnpm/workbox-window@7.0.0/node_modules/workbox-window/build/workbox-window.prod.es5.mjs": [
+    "/assets/workbox-window.prod.es5-a7b12eab.js"
+  ],
+  "src/App.vue?vue&type=script&setup=true&lang.ts": [
+  ],
+  "src/components/TheFooter.vue?vue&type=script&setup=true&lang.ts": [
+  ],
+  "src/components/TheInput.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "src/composables/dark.ts": [
+  ],
+  "src/layouts/404.vue": [
+    "/assets/404-e9a0511e.js"
+  ],
+  "src/layouts/404.vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/404-e9a0511e.js"
+  ],
+  "src/layouts/default.vue": [
+  ],
+  "src/layouts/home.vue": [
+    "/assets/home-826b1093.js"
+  ],
+  "src/main.ts": [
+  ],
+  "src/modules/i18n.ts": [
+  ],
+  "src/modules/nprogress.ts": [
+  ],
+  "src/modules/pinia.ts": [
+  ],
+  "src/modules/pwa.ts": [
+  ],
+  "src/pages/README.md": [
+    "/assets/README-919ba877.js"
+  ],
+  "src/pages/[...all].vue": [
+    "/assets/_...all_-b81e0c2c.js"
+  ],
+  "src/pages/[...all].vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/_...all_-b81e0c2c.js"
+  ],
+  "src/pages/about.md": [
+    "/assets/about-74a58361.js"
+  ],
+  "src/pages/flightTracker.vue": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "src/pages/flightTracker.vue?vue&type=script&setup=true&lang.js": [
+    "/assets/flightTracker-ae5297c1.js"
+  ],
+  "src/pages/hi/[name].vue": [
+    "/assets/_name_-b7ebca09.js"
+  ],
+  "src/pages/hi/[name].vue?vue&type=script&setup=true&lang.ts": [
+    "/assets/_name_-b7ebca09.js"
+  ],
+  "src/pages/index.vue": [
+  ],
+  "src/pages/index.vue?vue&type=script&setup=true&lang.ts": [
+  ],
+  "src/stores/user.ts": [
+    "/assets/user-0abf511f.js"
+  ],
+  "src/styles/main.css": [
+  ]
+}
