@@ -14,7 +14,7 @@
   "../../../../@vite-plugin-pages/route-block": [
   ],
   "../../../../@vite-plugin-pwa/virtual:pwa-register": [
-    "/assets/virtual_pwa-register-1e03dd01.js"
+    "/assets/virtual_pwa-register-86e6933b.js"
   ],
   "../../../../@vite-plugin-vue-layouts/generated-layouts": [
   ],
@@ -80,33 +80,33 @@
   "locales/zh-CN.yml": [
     "/assets/zh-CN-78ecf232.js"
   ],
-  "node_modules/.pnpm/@intlify+core-base@9.12.1/node_modules/@intlify/core-base/dist/core-base.mjs": [
+  "node_modules/.pnpm/@intlify+core-base@9.2.2/node_modules/@intlify/core-base/dist/core-base.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/@intlify+message-compiler@9.12.1/node_modules/@intlify/message-compiler/dist/message-compiler.esm-browser.js": [
+  "node_modules/.pnpm/@intlify+devtools-if@9.2.2/node_modules/@intlify/devtools-if/dist/devtools-if.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/@intlify+shared@9.12.1/node_modules/@intlify/shared/dist/shared.mjs": [
+  "node_modules/.pnpm/@intlify+message-compiler@9.2.2/node_modules/@intlify/message-compiler/dist/message-compiler.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/@unhead+dom@1.9.5/node_modules/@unhead/dom/dist/index.mjs": [
+  "node_modules/.pnpm/@intlify+shared@9.2.2/node_modules/@intlify/shared/dist/shared.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/@unhead+shared@1.9.5/node_modules/@unhead/shared/dist/index.mjs": [
+  "node_modules/.pnpm/@unhead+dom@1.1.30/node_modules/@unhead/dom/dist/index.mjs": [
   ],
-  "node_modules/.pnpm/@unhead+vue@1.9.5_vue@3.4.23_typescript@5.4.5_/node_modules/@unhead/vue/dist/shared/vue.cf295fb1.mjs": [
+  "node_modules/.pnpm/@unhead+shared@1.1.30/node_modules/@unhead/shared/dist/index.mjs": [
   ],
-  "node_modules/.pnpm/@unhead+vue@1.9.5_vue@3.4.23_typescript@5.4.5_/node_modules/@unhead/vue/dist/shared/vue.f36acd1f.mjs": [
+  "node_modules/.pnpm/@unhead+vue@1.1.30_vue@3.3.4/node_modules/@unhead/vue/dist/shared/vue.505b826e.mjs": [
   ],
-  "node_modules/.pnpm/@unocss+reset@0.53.6/node_modules/@unocss/reset/tailwind.css": [
+  "node_modules/.pnpm/@unocss+reset@0.53.5/node_modules/@unocss/reset/tailwind.css": [
   ],
-  "node_modules/.pnpm/@vue+reactivity@3.4.23/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js": [
+  "node_modules/.pnpm/@vue+reactivity@3.3.4/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/@vue+runtime-core@3.4.23/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js": [
+  "node_modules/.pnpm/@vue+runtime-core@3.3.4/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/@vue+runtime-dom@3.4.23/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js": [
+  "node_modules/.pnpm/@vue+runtime-dom@3.3.4/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/@vue+shared@3.4.23/node_modules/@vue/shared/dist/shared.esm-bundler.js": [
+  "node_modules/.pnpm/@vue+shared@3.3.4/node_modules/@vue/shared/dist/shared.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/@vueuse+core@10.9.0_vue@3.4.23_typescript@5.4.5_/node_modules/@vueuse/core/index.mjs": [
+  "node_modules/.pnpm/@vueuse+core@10.2.1_vue@3.3.4/node_modules/@vueuse/core/index.mjs": [
   ],
-  "node_modules/.pnpm/@vueuse+shared@10.9.0_vue@3.4.23_typescript@5.4.5_/node_modules/@vueuse/shared/index.mjs": [
+  "node_modules/.pnpm/@vueuse+shared@10.2.1_vue@3.3.4/node_modules/@vueuse/shared/index.mjs": [
   ],
   "node_modules/.pnpm/axios@1.6.8/node_modules/axios/lib/adapters/adapters.js": [
   ],
@@ -198,21 +198,21 @@
   ],
   "node_modules/.pnpm/nprogress@0.2.0/node_modules/nprogress/nprogress.js": [
   ],
-  "node_modules/.pnpm/pinia@2.1.7_typescript@5.4.5_vue@3.4.23_typescript@5.4.5_/node_modules/pinia/dist/pinia.mjs": [
+  "node_modules/.pnpm/pinia@2.1.4_typescript@5.1.6_vue@3.3.4/node_modules/pinia/dist/pinia.mjs": [
   ],
-  "node_modules/.pnpm/unhead@1.9.5/node_modules/unhead/dist/index.mjs": [
+  "node_modules/.pnpm/unhead@1.1.30/node_modules/unhead/dist/index.mjs": [
   ],
-  "node_modules/.pnpm/vite-ssg@0.23.6_critters@0.0.19_vite@4.5.3_@types+node@20.12.7_terser@5.30.3__vue-router@4.3._x7o5nymhsgsyk6f4wfw4i35z34/node_modules/vite-ssg/dist/index.mjs": [
+  "node_modules/.pnpm/vite-ssg@0.23.0_@unhead+vue@1.1.30_critters@0.0.19_vite@4.4.3_vue-router@4.2.4_vue@3.3.4/node_modules/vite-ssg/dist/index.mjs": [
   ],
-  "node_modules/.pnpm/vite-ssg@0.23.6_critters@0.0.19_vite@4.5.3_@types+node@20.12.7_terser@5.30.3__vue-router@4.3._x7o5nymhsgsyk6f4wfw4i35z34/node_modules/vite-ssg/dist/shared/vite-ssg.5912142e.mjs": [
+  "node_modules/.pnpm/vite-ssg@0.23.0_@unhead+vue@1.1.30_critters@0.0.19_vite@4.4.3_vue-router@4.2.4_vue@3.3.4/node_modules/vite-ssg/dist/shared/vite-ssg.5912142e.mjs": [
   ],
-  "node_modules/.pnpm/vite-ssg@0.23.6_critters@0.0.19_vite@4.5.3_@types+node@20.12.7_terser@5.30.3__vue-router@4.3._x7o5nymhsgsyk6f4wfw4i35z34/node_modules/vite-ssg/dist/shared/vite-ssg.a009fbf1.mjs": [
+  "node_modules/.pnpm/vite-ssg@0.23.0_@unhead+vue@1.1.30_critters@0.0.19_vite@4.4.3_vue-router@4.2.4_vue@3.3.4/node_modules/vite-ssg/dist/shared/vite-ssg.a009fbf1.mjs": [
   ],
-  "node_modules/.pnpm/vue-demi@0.14.7_vue@3.4.23_typescript@5.4.5_/node_modules/vue-demi/lib/index.mjs": [
+  "node_modules/.pnpm/vue-demi@0.14.5_vue@3.3.4/node_modules/vue-demi/lib/index.mjs": [
   ],
-  "node_modules/.pnpm/vue-i18n@9.12.1_vue@3.4.23_typescript@5.4.5_/node_modules/vue-i18n/dist/vue-i18n.runtime.mjs": [
+  "node_modules/.pnpm/vue-i18n@9.2.2_vue@3.3.4/node_modules/vue-i18n/dist/vue-i18n.runtime.esm-bundler.js": [
   ],
-  "node_modules/.pnpm/vue-router@4.3.0_vue@3.4.23_typescript@5.4.5_/node_modules/vue-router/dist/vue-router.mjs": [
+  "node_modules/.pnpm/vue-router@4.2.4_vue@3.3.4/node_modules/vue-router/dist/vue-router.mjs": [
   ],
   "node_modules/.pnpm/workbox-window@7.0.0/node_modules/workbox-window/build/workbox-window.prod.es5.mjs": [
     "/assets/workbox-window.prod.es5-a7b12eab.js"
@@ -226,15 +226,15 @@
   "src/composables/dark.ts": [
   ],
   "src/layouts/404.vue": [
-    "/assets/404-961016d5.js"
+    "/assets/404-c29e1c46.js"
   ],
   "src/layouts/404.vue?vue&type=script&setup=true&lang.ts": [
-    "/assets/404-961016d5.js"
+    "/assets/404-c29e1c46.js"
   ],
   "src/layouts/default.vue": [
   ],
   "src/layouts/home.vue": [
-    "/assets/home-734a4cc7.js"
+    "/assets/home-fcd3b536.js"
   ],
   "src/main.ts": [
   ],
@@ -247,27 +247,32 @@
   "src/modules/pwa.ts": [
   ],
   "src/pages/README.md": [
-    "/assets/README-9e943493.js"
+    "/assets/README-fc1b35f9.js"
   ],
   "src/pages/[...all].vue": [
-    "/assets/_...all_-ca37ff56.js"
+    "/assets/_...all_-c44e0b26.js"
   ],
   "src/pages/[...all].vue?vue&type=script&setup=true&lang.ts": [
-    "/assets/_...all_-ca37ff56.js"
+    "/assets/_...all_-c44e0b26.js"
   ],
   "src/pages/about.md": [
-    "/assets/about-eff8fb97.js"
+    "/assets/about-7ec9908c.js"
   ],
   "src/pages/flightTracker.vue": [
-    "/assets/flightTracker-0155ab30.js"
+    "/assets/flightTracker-d5693636.js"
+  ],
+  "src/pages/flightTracker.vue?vue&type=script&setup=true&lang.js": [
+    "/assets/flightTracker-d5693636.js"
   ],
   "src/pages/hi/[name].vue": [
-    "/assets/_name_-958b06ed.js"
+    "/assets/_name_-d70b573f.js"
   ],
   "src/pages/hi/[name].vue?vue&type=script&setup=true&lang.ts": [
-    "/assets/_name_-958b06ed.js"
+    "/assets/_name_-d70b573f.js"
   ],
   "src/pages/index.vue": [
+  ],
+  "src/pages/index.vue?vue&type=script&setup=true&lang.js": [
   ],
   "src/stores/user.ts": [
   ],
