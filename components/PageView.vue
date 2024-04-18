@@ -29,7 +29,7 @@ const router = useRouter()
 function arr_time() {
   if (filtered_flight[0].time.other.eta)
     return new Date(filtered_flight[0].time.other.eta * 1000).toLocaleString()
-  else return 'Scheduled'
+  else return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleString()
 }
 async function go() {
   user.listedFlights = []
