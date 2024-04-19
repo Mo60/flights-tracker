@@ -29,8 +29,11 @@ if (localStorage.getItem('listed_flights')) {
 const router = useRouter()
 function arr_time() {
   if (filtered_flight[0].time.other.eta)
-    return new Date(filtered_flight[0].time.other.eta * 1000).toLocaleString()
-  else return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleString()
+    return new Date(filtered_flight[0].time.other.eta * 1000).toLocaleTimeString()
+  else return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleTimeString()
+}
+function STA_time () {
+  return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleString();
 }
 async function go() {
   user.listedFlights = []
@@ -66,6 +69,7 @@ async function go() {
           arr_time:  arr_time(),
           // arr_time: filtered_flight[0].time.other.eta,
           status: filtered_flight[0].status.text,
+          sta:  STA_time() ,
         })
        
         // await new Promise( setTimeout(() => {console.log("wait 2 sec")}, 2000))
@@ -153,8 +157,8 @@ function addFlight() {
     <!-- <div py-4 /> -->
     <!-- {{ typeof day }} -->
 
-    <div>
-      <table class="m-auto max-w-5xl rounded shadow-md">
+    <div >
+      <table class="m-auto  rounded shadow-md">
         <thead>
           <tr>
             <th class="w-1/3 border border-r-0 border-gray-300 bg-gray-100 p-4 font-normal sm:w-1/4">
@@ -178,6 +182,9 @@ function addFlight() {
               {{ flight.flight }}
             </td>
             <td class="w-1/3 border border-r-0 border-gray-300 bg-white p-4 font-normal sm:w-1/4">
+              {{ flight.sta }}
+            </td>
+            <td class="w-1/3 border border-r-0 border-gray-300 bg-white p-4 font-normal sm:w-1/4">
               {{ flight.arr_time }}
             </td>
             <td class="w-1/3 border border-r-0 border-gray-300 bg-white p-4 font-normal sm:w-1/4">
@@ -186,6 +193,7 @@ function addFlight() {
           </tr>
         </tbody>
       </table>
+      <!-- {{ user.listedFlights }} -->
       <!-- {{ filtered_flight }} -->
       {{ user.savedName }}
       <button
