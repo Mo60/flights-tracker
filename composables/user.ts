@@ -4,6 +4,7 @@ export const useUserStore = defineStore('user', () => {
   /**
    * Current named of the user.
    */
+  const requestSent = ref()
   const listedFlights = ref([])
   const savedKey = ref('')
   const inputKey = ref('')
@@ -37,6 +38,7 @@ export const useUserStore = defineStore('user', () => {
     inputKey,
     inputFlight,
     listedFlights,
+    requestSent
   }
 })
 

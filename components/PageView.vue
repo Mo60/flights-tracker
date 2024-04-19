@@ -15,6 +15,7 @@ const date_formated = `${year}-${month}-${day}`
 const user = useUserStore()
 user.savedKey = localStorage.getItem('access_key')
 let filtered_flight = []
+// console.log(localStorage.getItem('tracked_flights'))
 if (localStorage.getItem('tracked_flights'))
   user.trackedFlights = user.trackedFlights.concat(localStorage.getItem('tracked_flights').split(',').filter(item => !user.trackedFlights.includes(item)))
 if (localStorage.getItem('listed_flights')) {
@@ -35,12 +36,12 @@ async function go() {
   user.listedFlights = []
   user.savedName = `last updated :${date.toLocaleString()}`
   localStorage.setItem('last_updated', user.savedName)
-  await user.trackedFlights.forEach(async (item) => {
+    user.trackedFlights.forEach(async (item) => {
     const options = {
       method: 'GET',
       url: 'https://flight-radar1.p.rapidapi.com/flights/get-more-info',
       params: {
-        query: item,
+        query:  item,
         fetchBy: 'flight',
         page: '1',
         limit: '100',
@@ -50,25 +51,40 @@ async function go() {
         'X-RapidAPI-Host': 'flight-radar1.p.rapidapi.com',
       },
     }
-
+    // console.log(user.trackedFlights.indexOf(item))
+    await new Promise( ()=> setTimeout(async () => {
+      console.log("wait "+ user.trackedFlights.indexOf(item) +" sec")
     try {
+      user.requestSent = 0
       // console.log(item)
-      const response = await axios.request(options)
+      const response = await axios.request(options).then(console.log(item))
       filtered_flight = await response.data.result.response.data.filter(item => (`0${new Date((item.time.scheduled.arrival) * 1000).getDate().toString()}`).slice(-2) === day)
       // console.log(filtered_flight)
       if (filtered_flight[0]) {
-        await user.listedFlights.push({
+        await new Promise( async () => { user.listedFlights.push({
           flight: filtered_flight[0].identification.number.default,
-          arr_time: arr_time(),
+          arr_time:  arr_time(),
           // arr_time: filtered_flight[0].time.other.eta,
           status: filtered_flight[0].status.text,
         })
+       
+        // await new Promise( setTimeout(() => {console.log("wait 2 sec")}, 2000))
+        })
         localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
+        user.requestSent++
       }
+      // if (user.requestSent == 5 || user.requestSent == 10) {
+      //     //wait 2 sec
+      //    await new Promise( setTimeout(() => {console.log("wait 1 sec")}, 1000))
+      //    await new Promise( setTimeout(() => {console.log("wait 1 sec")}, 1000))
+      //   }  
     }
     catch (error) {
       console.error(error)
     }
+
+    }, user.trackedFlights.indexOf(item) * 1000))
+    
   })
 
   // message = ''
@@ -89,9 +105,11 @@ function save() {
   user.inputKey = ''
 }
 function addFlight() {
+  if (user.inputFlight.length > 3) {
   user.trackedFlights.push(user.inputFlight)
   localStorage.setItem('tracked_flights', (user.trackedFlights))
   user.inputFlight = ''
+  }
 }
 // user.listedFlights = []
 
@@ -117,9 +135,16 @@ function addFlight() {
     <div text-4xl>
       <div i-skill-icons:devto-dark inline-block />
     </div>
-    <p />
+    <p>
     <!-- <h1> {{ date_string }} </h1> -->
+    listed flight length : {{ user.listedFlights.length }}
+    </p>
+    <p>
+    i = {{ user.requestSent }}
+    </p>
+    <p>
     {{ date_formated }}
+  </p>
     <p> flight tracking page</p>
     <p>
       Page's under construction
@@ -134,6 +159,9 @@ function addFlight() {
           <tr>
             <th class="w-1/3 border border-r-0 border-gray-300 bg-gray-100 p-4 font-normal sm:w-1/4">
               Flight
+            </th>
+            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray-100 p-4 font-normal sm:w-1/4">
+              STA
             </th>
             <th class="w-1/3 border border-r-0 border-gray-300 bg-gray-100 p-4 font-normal sm:w-1/4">
               ETA
