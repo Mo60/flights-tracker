@@ -161,16 +161,16 @@ function addFlight() {
       <table class="m-auto  rounded shadow-md">
         <thead>
           <tr>
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray-100 p-4 font-normal sm:w-1/4">
+            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
               Flight
             </th>
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray-100 p-4 font-normal sm:w-1/4">
+            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
               STA
             </th>
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray-100 p-4 font-normal sm:w-1/4">
+            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
               ETA
             </th>
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray-100 p-4 font-normal sm:w-1/4">
+            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
               Status
             </th>
           </tr>
@@ -178,16 +178,16 @@ function addFlight() {
         <!-- use the filtered list -->
         <tbody v-for="flight in user.listedFlights" :key="flight._id">
           <tr>
-            <td class="w-1/3 border border-r-0 border-gray-300 bg-white p-4 font-normal sm:w-1/4">
+            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
               {{ flight.flight }}
             </td>
-            <td class="w-1/3 border border-r-0 border-gray-300 bg-white p-4 font-normal sm:w-1/4">
+            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
               {{ flight.sta }}
             </td>
-            <td class="w-1/3 border border-r-0 border-gray-300 bg-white p-4 font-normal sm:w-1/4">
+            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
               {{ flight.arr_time }}
             </td>
-            <td class="w-1/3 border border-r-0 border-gray-300 bg-white p-4 font-normal sm:w-1/4">
+            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
               {{ flight.status }}
             </td>
           </tr>
