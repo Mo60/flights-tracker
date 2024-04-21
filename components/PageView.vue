@@ -69,13 +69,14 @@ async function go() {
           arr_time:  arr_time(),
           // arr_time: filtered_flight[0].time.other.eta,
           status: filtered_flight[0].status.text,
-          sta:  STA_time() ,
-        })
-       
-        // await new Promise( setTimeout(() => {console.log("wait 2 sec")}, 2000))
+          sta:  STA_time(),
+          sta_unix: filtered_flight[0].time.scheduled.arrival,
         })
         localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
         user.requestSent++
+        // await new Promise( setTimeout(() => {console.log("wait 2 sec")}, 2000))
+        })
+        
       }
       // if (user.requestSent == 5 || user.requestSent == 10) {
       //     //wait 2 sec
@@ -115,6 +116,23 @@ function addFlight() {
   user.inputFlight = ''
   }
 }
+function sortBySTA() {
+  console.log('sortBYSTA pressed')
+      if (!user.isSortedBySTA) {
+        user.listedFlights.sort((a, b) => {
+          if (a.sta_unix < b.sta_unix) {
+            return -1;
+          }
+          if (a.sta_unix > b.sta_unix) {
+            return 1;
+          }
+        })
+      } else {
+        user.listedFlights.sort().reverse();
+      }
+      user.isSortedBySTA = !user.isSortedBySTA
+    }
+    
 // user.listedFlights = []
 
 // function go_home() {
@@ -164,9 +182,9 @@ function addFlight() {
             <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
               Flight
             </th>
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
-              STA
-            </th>
+            <th  @click="sortBySTA"  class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
+              STA <p btn i-carbon-arrow-down v-if="user.isSortedBySTA"/><p  btn i-carbon-dot-mark v-else/>
+            </th>         
             <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
               ETA
             </th>
