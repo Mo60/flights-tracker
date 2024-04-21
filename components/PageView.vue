@@ -36,6 +36,7 @@ function STA_time () {
   return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleString();
 }
 async function go() {
+  user.isSortedBySTA = false
   user.listedFlights = []
   user.savedName = `last updated :${date.toLocaleString()}`
   localStorage.setItem('last_updated', user.savedName)
@@ -56,7 +57,7 @@ async function go() {
     }
     // console.log(user.trackedFlights.indexOf(item))
     await new Promise( ()=> setTimeout(async () => {
-      console.log("wait "+ user.trackedFlights.indexOf(item) +" sec")
+      // console.log("wait "+ user.trackedFlights.indexOf(item) +" sec")
     try {
       user.requestSent = 0
       // console.log(item)
@@ -71,7 +72,9 @@ async function go() {
           status: filtered_flight[0].status.text,
           sta:  STA_time(),
           sta_unix: filtered_flight[0].time.scheduled.arrival,
+          aircraft: filtered_flight[0].aircraft.model.text,
         })
+        // console.log(filtered_flight)
         localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
         user.requestSent++
         // await new Promise( setTimeout(() => {console.log("wait 2 sec")}, 2000))
@@ -117,7 +120,7 @@ function addFlight() {
   }
 }
 function sortBySTA() {
-  console.log('sortBYSTA pressed')
+  // console.log('sortBYSTA pressed')
       if (!user.isSortedBySTA) {
         user.listedFlights.sort((a, b) => {
           if (a.sta_unix < b.sta_unix) {
@@ -191,6 +194,9 @@ function sortBySTA() {
             <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
               Status
             </th>
+            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
+              Aircraft
+            </th>
           </tr>
         </thead>
         <!-- use the filtered list -->
@@ -207,6 +213,9 @@ function sortBySTA() {
             </td>
             <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
               {{ flight.status }}
+            </td>
+            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
+              {{ flight.aircraft }}
             </td>
           </tr>
         </tbody>
