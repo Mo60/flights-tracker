@@ -4,6 +4,9 @@ export const useUserStore = defineStore('user', () => {
   /**
    * Current named of the user.
    */
+  const showVersionMessage = ref(false)
+  const message = ref('')
+  const isSortedByETA = ref(false)
   const isSortedBySTA = ref(false)
   const requestSent = ref()
   const listedFlights = ref([])
@@ -33,7 +36,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     setNewName,
     otherNames,
-    savedName,
+    message,
     savedKey,
     trackedFlights,
     inputKey,
@@ -41,6 +44,8 @@ export const useUserStore = defineStore('user', () => {
     listedFlights,
     requestSent,
     isSortedBySTA,
+    isSortedByETA,
+    showVersionMessage,
   }
 })
 

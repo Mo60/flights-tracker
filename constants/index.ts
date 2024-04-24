@@ -1,2 +1,2 @@
-export const appName = 'Vitesse for Nuxt 3'
-export const appDescription = 'Vitesse for Nuxt 3'
+export const appName = 'FLights Tracker'
+export const appDescription = 'An app that tracks flights using Vitesse for Nuxt 3 template'

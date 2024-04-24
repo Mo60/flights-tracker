@@ -22,7 +22,7 @@ if (localStorage.getItem('listed_flights')) {
   JSON.parse(localStorage.getItem('listed_flights')).forEach((item) => {
     user.listedFlights.push(item)
   })
-  user.savedName = localStorage.getItem('last_updated')
+  user.message = localStorage.getItem('last_updated')
 }
 // if (localStorage.getItem('listed_flights'))
 // user.listedFlights = JSON.parse( localStorage.getItem('listed_flights'))
@@ -37,9 +37,10 @@ function STA_time () {
 }
 async function go() {
   user.isSortedBySTA = false
+  user.isSortedByETA = false
   user.listedFlights = []
-  user.savedName = `last updated :${date.toLocaleString()}`
-  localStorage.setItem('last_updated', user.savedName)
+  user.message = `last updated :${date.toLocaleString()}`
+  localStorage.setItem('last_updated', user.message)
     user.trackedFlights.forEach(async (item) => {
     const options = {
       method: 'GET',
@@ -72,6 +73,7 @@ async function go() {
           status: filtered_flight[0].status.text,
           sta:  STA_time(),
           sta_unix: filtered_flight[0].time.scheduled.arrival,
+          eta_unix: filtered_flight[0].time.other.eta,
           aircraft: filtered_flight[0].aircraft.model.text,
         })
         // console.log(filtered_flight)
@@ -134,8 +136,28 @@ function sortBySTA() {
         user.listedFlights.sort().reverse();
       }
       user.isSortedBySTA = !user.isSortedBySTA
+      user.isSortedByETA = false
     }
-    
+    function sortByETA() {
+  // console.log('sortBYSTA pressed')
+      if (!user.isSortedByETA) {
+        user.listedFlights.sort((a, b) => {
+          if (a.eta_unix < b.eta_unix) {
+            return -1;
+          }
+          if (a.eta_unix > b.eta_unix) {
+            return 1;
+          }
+        })
+      } else {
+        user.listedFlights.sort().reverse();
+      }
+      user.isSortedByETA = !user.isSortedByETA
+      user.isSortedBySTA = false
+    } 
+function showVersionMessage() {
+  user.showVersionMessage = !user.showVersionMessage
+}
 // user.listedFlights = []
 
 // function go_home() {
@@ -157,44 +179,55 @@ function sortBySTA() {
 
 <template>
   <div>
-    <div text-4xl>
-      <div i-skill-icons:devto-dark inline-block />
+    <div >
+      <!-- text-4xl -->
+      <!-- <div i-skill-icons:devto-dark inline-block /> -->
     </div>
     <p>
     <!-- <h1> {{ date_string }} </h1> -->
-    listed flight length : {{ user.listedFlights.length }}
+    <!-- listed flight length : {{ user.listedFlights.length }} -->
     </p>
     <p>
-    i = {{ user.requestSent }}
+    <!-- i = {{ user.requestSent }} -->
     </p>
     <p>
-    {{ date_formated }}
+    <!-- {{ date_formated }} -->
   </p>
-    <p> flight tracking page</p>
+    <!-- <p> flight tracking page</p> -->
     <p>
-      Page's under construction
+      Page's under construction 
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
-    <!-- <div py-4 /> -->
+    <div py-4 />
+    <p cursor-pointer text-blue  @click="showVersionMessage" > v 0.1.6</p>
+    <div  v-show="user.showVersionMessage" style="transition: width 4s;" class="bg-yellow-100 p-4 m-auto w-3/4" >
+      <p> </p>
+      <p> &nearr; Added sort by ETA functionality </p>
+      <p> &nearr; Changed table format </p>
+      <p> &nearr; Removed some messages </p>
+    </div>
+    <div py-4 />
     <!-- {{ typeof day }} -->
-
+    
     <div >
-      <table class="m-auto  rounded shadow-md">
+      <table class=" m-auto">
+      <!-- m-auto  rounded shadow-md"> -->
         <thead>
           <tr>
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
+            <th class="border border-gray-300 bg-gray">
+             <!-- w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4"> -->
               Flight
             </th>
-            <th  @click="sortBySTA"  class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
+            <th  @click="sortBySTA"  class="border bg-gray ">
               STA <p btn i-carbon-arrow-down v-if="user.isSortedBySTA"/><p  btn i-carbon-dot-mark v-else/>
             </th>         
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
-              ETA
+            <th  @click="sortByETA" class="border bg-gray ">
+              ETA <p btn i-carbon-arrow-down v-if="user.isSortedByETA"/><p  btn i-carbon-dot-mark v-else/>
             </th>
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
+            <th class="border bg-gray">
               Status
             </th>
-            <th class="w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4">
+            <th class="border bg-gray">
               Aircraft
             </th>
           </tr>
@@ -202,27 +235,29 @@ function sortBySTA() {
         <!-- use the filtered list -->
         <tbody v-for="flight in user.listedFlights" :key="flight._id">
           <tr>
-            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
+            <td class="border">
+              <!-- w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4 -->
               {{ flight.flight }}
             </td>
-            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
+            <td class="border">
               {{ flight.sta }}
             </td>
-            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
+            <td class="border">
               {{ flight.arr_time }}
             </td>
-            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
+            <td class="border">
               {{ flight.status }}
             </td>
-            <td class="w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4">
+            <td class="border ">
               {{ flight.aircraft }}
             </td>
           </tr>
         </tbody>
       </table>
+      <div py-4 />
       <!-- {{ user.listedFlights }} -->
       <!-- {{ filtered_flight }} -->
-      {{ user.savedName }}
+      {{ user.message }}
       <button
         m-3 text-sm btn
         @click="go"
@@ -231,9 +266,8 @@ function sortBySTA() {
       </button>
     </div>
     <div py-4 />
-
+    <p> Add flight to check status: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
     <p>
-      Add flight to check status
       <input
         id="input2"
         v-model="user.inputFlight"
@@ -245,7 +279,7 @@ function sortBySTA() {
         w="250px"
         text="center"
         bg="transparent"
-        border="~ rounded gray-200 dark:gray-700"
+        :border="'~ rounded gray-200 dark:gray-700'"
         outline="none active:none"
         @keydown.enter="addFlight"
       />
@@ -268,7 +302,7 @@ function sortBySTA() {
         w="250px"
         text="center"
         bg="transparent"
-        border="~ rounded gray-200 dark:gray-700"
+        :border="'~ rounded gray-200 dark:gray-700'"
         outline="none active:none"
         @keydown.enter="save"
       />
@@ -308,3 +342,6 @@ function sortBySTA() {
     </div>
   </div>
 </template>
+<style>
+
+</style>
