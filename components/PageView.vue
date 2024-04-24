@@ -6,13 +6,15 @@ defineOptions({
 })
 // const { t } = useI18n()
 // let message =  JSON.parse(localStorage.getItem("listed_flights"))[0]
-const date = new Date()
+const today_date = new Date()
 // const date_string = date.toString() // .replace(/T/, ':').replace(/\.\w*/, '')
-const year = date.getFullYear().toString()
-const month = `0${date.getMonth() + 1}`.slice(-2)
-const day = `0${date.getDate().toString()}`.slice(-2)
+const year = today_date.getFullYear().toString()
+const month = `0${today_date.getMonth() + 1}`.slice(-2)
+const day = `0${today_date.getDate().toString()}`.slice(-2)
+const day_number = today_date.getDate()
 const date_formated = `${year}-${month}-${day}`
 const user = useUserStore()
+user.selectedDate = new Date(year,month-1,day_number)
 user.savedKey = localStorage.getItem('access_key')
 let filtered_flight = []
 // console.log(localStorage.getItem('tracked_flights'))
@@ -32,21 +34,21 @@ function arr_time() {
     return new Date(filtered_flight[0].time.other.eta * 1000).toLocaleTimeString()
   else return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleTimeString()
 }
-function STA_time () {
+function STA_time() {
   return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleString();
 }
 async function go() {
   user.isSortedBySTA = false
   user.isSortedByETA = false
   user.listedFlights = []
-  user.message = `last updated :${date.toLocaleString()}`
+  user.message = `last updated: ${today_date.toLocaleString()}`
   localStorage.setItem('last_updated', user.message)
-    user.trackedFlights.forEach(async (item) => {
+  user.trackedFlights.forEach(async (item) => {
     const options = {
       method: 'GET',
       url: 'https://flight-radar1.p.rapidapi.com/flights/get-more-info',
       params: {
-        query:  item,
+        query: item,
         fetchBy: 'flight',
         page: '1',
         limit: '100',
@@ -57,44 +59,47 @@ async function go() {
       },
     }
     // console.log(user.trackedFlights.indexOf(item))
-    await new Promise( ()=> setTimeout(async () => {
+    await new Promise(() => setTimeout(async () => {
       // console.log("wait "+ user.trackedFlights.indexOf(item) +" sec")
-    try {
-      user.requestSent = 0
-      // console.log(item)
-      const response = await axios.request(options).then(console.log(item))
-      filtered_flight = await response.data.result.response.data.filter(item => (`0${new Date((item.time.scheduled.arrival) * 1000).getDate().toString()}`).slice(-2) === day)
-      // console.log(filtered_flight)
-      if (filtered_flight[0]) {
-        await new Promise( async () => { user.listedFlights.push({
-          flight: filtered_flight[0].identification.number.default,
-          arr_time:  arr_time(),
-          // arr_time: filtered_flight[0].time.other.eta,
-          status: filtered_flight[0].status.text,
-          sta:  STA_time(),
-          sta_unix: filtered_flight[0].time.scheduled.arrival,
-          eta_unix: filtered_flight[0].time.other.eta,
-          aircraft: filtered_flight[0].aircraft.model.text,
-        })
-        // console.log(filtered_flight)
-        localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
-        user.requestSent++
-        // await new Promise( setTimeout(() => {console.log("wait 2 sec")}, 2000))
-        })
+      try {
+        user.requestSent = 0
+        // console.log(item)
+        const response = await axios.request(options).then(console.log(item))
+        // filtered_flight = await response.data.result.response.data.filter(item => (`0${new Date((item.time.scheduled.arrival) * 1000).getDate().toString()}`).slice(-2) === day)
+        filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
         
+        // console.log(filtered_flight)
+        if (filtered_flight[0]) {
+          await new Promise(async () => {
+            user.listedFlights.push({
+              flight: filtered_flight[0].identification.number.default,
+              arr_time: arr_time(),
+              // arr_time: filtered_flight[0].time.other.eta,
+              status: filtered_flight[0].status.text,
+              sta: STA_time(),
+              sta_unix: filtered_flight[0].time.scheduled.arrival,
+              eta_unix: filtered_flight[0].time.other.eta,
+              aircraft: filtered_flight[0].aircraft.model.text,
+            })
+            // console.log(filtered_flight)
+            localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
+            user.requestSent++
+            // await new Promise( setTimeout(() => {console.log("wait 2 sec")}, 2000))
+          })
+
+        }
+        // if (user.requestSent == 5 || user.requestSent == 10) {
+        //     //wait 2 sec
+        //    await new Promise( setTimeout(() => {console.log("wait 1 sec")}, 1000))
+        //    await new Promise( setTimeout(() => {console.log("wait 1 sec")}, 1000))
+        //   }  
       }
-      // if (user.requestSent == 5 || user.requestSent == 10) {
-      //     //wait 2 sec
-      //    await new Promise( setTimeout(() => {console.log("wait 1 sec")}, 1000))
-      //    await new Promise( setTimeout(() => {console.log("wait 1 sec")}, 1000))
-      //   }  
-    }
-    catch (error) {
-      console.error(error)
-    }
+      catch (error) {
+        console.error(error)
+      }
 
     }, user.trackedFlights.indexOf(item) * 1000))
-    
+
   })
 
   // message = ''
@@ -116,45 +121,45 @@ function save() {
 }
 function addFlight() {
   if (user.inputFlight.length > 3) {
-  user.trackedFlights.push(user.inputFlight)
-  localStorage.setItem('tracked_flights', (user.trackedFlights))
-  user.inputFlight = ''
+    user.trackedFlights.push(user.inputFlight)
+    localStorage.setItem('tracked_flights', (user.trackedFlights))
+    user.inputFlight = ''
   }
 }
 function sortBySTA() {
   // console.log('sortBYSTA pressed')
-      if (!user.isSortedBySTA) {
-        user.listedFlights.sort((a, b) => {
-          if (a.sta_unix < b.sta_unix) {
-            return -1;
-          }
-          if (a.sta_unix > b.sta_unix) {
-            return 1;
-          }
-        })
-      } else {
-        user.listedFlights.sort().reverse();
+  if (!user.isSortedBySTA) {
+    user.listedFlights.sort((a, b) => {
+      if (a.sta_unix < b.sta_unix) {
+        return -1;
       }
-      user.isSortedBySTA = !user.isSortedBySTA
-      user.isSortedByETA = false
-    }
-    function sortByETA() {
+      if (a.sta_unix > b.sta_unix) {
+        return 1;
+      }
+    })
+  } else {
+    user.listedFlights.sort().reverse();
+  }
+  user.isSortedBySTA = !user.isSortedBySTA
+  user.isSortedByETA = false
+}
+function sortByETA() {
   // console.log('sortBYSTA pressed')
-      if (!user.isSortedByETA) {
-        user.listedFlights.sort((a, b) => {
-          if (a.eta_unix < b.eta_unix) {
-            return -1;
-          }
-          if (a.eta_unix > b.eta_unix) {
-            return 1;
-          }
-        })
-      } else {
-        user.listedFlights.sort().reverse();
+  if (!user.isSortedByETA) {
+    user.listedFlights.sort((a, b) => {
+      if (a.eta_unix < b.eta_unix) {
+        return -1;
       }
-      user.isSortedByETA = !user.isSortedByETA
-      user.isSortedBySTA = false
-    } 
+      if (a.eta_unix > b.eta_unix) {
+        return 1;
+      }
+    })
+  } else {
+    user.listedFlights.sort().reverse();
+  }
+  user.isSortedByETA = !user.isSortedByETA
+  user.isSortedBySTA = false
+}
 function showVersionMessage() {
   user.showVersionMessage = !user.showVersionMessage
 }
@@ -179,50 +184,57 @@ function showVersionMessage() {
 
 <template>
   <div>
-    <div >
+    <div>
       <!-- text-4xl -->
       <!-- <div i-skill-icons:devto-dark inline-block /> -->
     </div>
     <p>
-    <!-- <h1> {{ date_string }} </h1> -->
-    <!-- listed flight length : {{ user.listedFlights.length }} -->
+      <!-- <h1> {{ date_string }} </h1> -->
+      <!-- listed flight length : {{ user.listedFlights.length }} -->
     </p>
     <p>
-    <!-- i = {{ user.requestSent }} -->
+      <!-- i = {{ user.requestSent }} -->
     </p>
     <p>
-    <!-- {{ date_formated }} -->
-  </p>
+      <!-- {{ day_number }} -->
+    </p>
+      <!-- {{ user.selectedDate }} -->
     <!-- <p> flight tracking page</p> -->
     <p>
-      Page's under construction 
+      Page's under construction
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
     <div py-4 />
-    <p cursor-pointer text-blue  @click="showVersionMessage" > v 0.1.6</p>
-    <div  v-show="user.showVersionMessage" style="transition: width 4s;" class="bg-yellow-100 p-4 m-auto w-3/4" >
+    <p cursor-pointer text-blue @click="showVersionMessage"> v 0.1.7</p>
+    <div v-show="user.showVersionMessage" style="transition: width 4s;" class="bg-yellow-100 p-4 m-auto w-3/4">
       <p> </p>
+      <p> &nearr; Added select date option </p>
+      <p> v 0.1.6</p>
       <p> &nearr; Added sort by ETA functionality </p>
       <p> &nearr; Changed table format </p>
       <p> &nearr; Removed some messages </p>
     </div>
     <div py-4 />
     <!-- {{ typeof day }} -->
-    
-    <div >
+
+    <div>
       <table class=" m-auto">
-      <!-- m-auto  rounded shadow-md"> -->
+        <!-- m-auto  rounded shadow-md"> -->
         <thead>
           <tr>
             <th class="border border-gray-300 bg-gray">
-             <!-- w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4"> -->
+              <!-- w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4"> -->
               Flight
             </th>
-            <th  @click="sortBySTA"  class="border bg-gray ">
-              STA <p btn i-carbon-arrow-down v-if="user.isSortedBySTA"/><p  btn i-carbon-dot-mark v-else/>
-            </th>         
-            <th  @click="sortByETA" class="border bg-gray ">
-              ETA <p btn i-carbon-arrow-down v-if="user.isSortedByETA"/><p  btn i-carbon-dot-mark v-else/>
+            <th @click="sortBySTA" class="border bg-gray ">
+              STA
+              <p btn i-carbon-arrow-down v-if="user.isSortedBySTA" />
+              <p btn i-carbon-dot-mark v-else />
+            </th>
+            <th @click="sortByETA" class="border bg-gray ">
+              ETA
+              <p btn i-carbon-arrow-down v-if="user.isSortedByETA" />
+              <p btn i-carbon-dot-mark v-else />
             </th>
             <th class="border bg-gray">
               Status
@@ -258,58 +270,39 @@ function showVersionMessage() {
       <!-- {{ user.listedFlights }} -->
       <!-- {{ filtered_flight }} -->
       {{ user.message }}
-      <button
-        m-3 text-sm btn
-        @click="go"
-      >
-        Go
-      </button>
+      <p>
+
+        <select v-model="user.selectedDate">
+          <option disabled="">Choose Date</option>
+          <option :value="new Date(year,month-1,day_number -3)">{{new Date(year,month-1,day_number -3).toLocaleDateString()}}</option>
+          <option :value="new Date(year,month-1,day_number -2)">{{new Date(year,month-1,day_number -2).toLocaleDateString()}}</option>
+          <option :value="new Date(year,month-1,day_number -1)">{{new Date(year,month-1,day_number -1).toLocaleDateString() }}</option>
+          <option :value="new Date(year,month-1,day_number)" >Today</option>
+          <option :value="new Date(year,month-1,day_number +1)">{{new Date(year,month-1,day_number +1).toLocaleDateString()}}</option>
+          <option :value="new Date(year,month-1,day_number +2)">{{new Date(year,month-1,day_number +2).toLocaleDateString()}}</option>
+          <option :value="new Date(year,month-1,day_number +3)">{{new Date(year,month-1,day_number +3).toLocaleDateString()}}</option>
+        </select>
+
+        <button m-3 text-sm btn @click="go">
+          Go
+        </button>
+      </p>
     </div>
     <div py-4 />
     <p> Add flight to check status: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
     <p>
-      <input
-        id="input2"
-        v-model="user.inputFlight"
-        placeholder=" example EK211 "
-        autocomplete="true"
-        type="text"
-        v-bind="$attrs"
-        p="x-4 y-2"
-        w="250px"
-        text="center"
-        bg="transparent"
-        :border="'~ rounded gray-200 dark:gray-700'"
-        outline="none active:none"
-        @keydown.enter="addFlight"
-      />
-      <button
-        m-3 text-sm btn
-        @click="addFlight"
-      >
+      <input id="input2" v-model="user.inputFlight" placeholder=" example EK211 " autocomplete="true" type="text"
+        v-bind="$attrs" p="x-4 y-2" w="250px" text="center" bg="transparent" :border="'~ rounded gray-200 dark:gray-700'"
+        outline="none active:none" @keydown.enter="addFlight" />
+      <button m-3 text-sm btn @click="addFlight">
         Add
       </button>
     </p>
     <p>
-      <input
-        id="input"
-        v-model="user.inputKey"
-        placeholder="enter X-RapidAPI-Key"
-        autocomplete="true"
-        type="text"
-        v-bind="$attrs"
-        p="x-4 y-2"
-        w="250px"
-        text="center"
-        bg="transparent"
-        :border="'~ rounded gray-200 dark:gray-700'"
-        outline="none active:none"
-        @keydown.enter="save"
-      />
-      <button
-        m-3 text-sm btn
-        @click="save"
-      >
+      <input id="input" v-model="user.inputKey" placeholder="enter X-RapidAPI-Key" autocomplete="true" type="text"
+        v-bind="$attrs" p="x-4 y-2" w="250px" text="center" bg="transparent" :border="'~ rounded gray-200 dark:gray-700'"
+        outline="none active:none" @keydown.enter="save" />
+      <button m-3 text-sm btn @click="save">
         Save
       </button>
       <!-- <button
@@ -321,15 +314,13 @@ function showVersionMessage() {
     </p>
     <!-- <div py-4 /> -->
     <p id="message">
-      user.savedKey :  {{ user.savedKey }}
+      user.savedKey : {{ user.savedKey }}
     </p>
     <p id="message">
       user.trackedFlights : click to delete
     </p>
-    <button
-      v-for="flight in user.trackedFlights" :key="flight._id" m-1 bg-red
-      @click="del(user.trackedFlights.indexOf(flight))"
-    >
+    <button v-for="flight in user.trackedFlights" :key="flight._id" m-1 bg-red
+      @click="del(user.trackedFlights.indexOf(flight))">
       {{ flight }}
     </button>
     <div>
@@ -343,5 +334,29 @@ function showVersionMessage() {
   </div>
 </template>
 <style>
+  select {
+    /* display: block; */
+  /* width: 100%; */
+  padding: .375rem 2.25rem .375rem .75rem;
+  -moz-padding-start: calc(0.75rem - 3px);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right .75rem center;
+  background-size: 16px 12px;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  word-wrap: normal;
+  margin-bottom: 0;
+  word-wrap: normal;
+  }
 
 </style>

@@ -4,6 +4,8 @@ export const useUserStore = defineStore('user', () => {
   /**
    * Current named of the user.
    */
+  const selectedDate =ref(new Date())
+  const selectedDay = ref('')
   const showVersionMessage = ref(false)
   const message = ref('')
   const isSortedByETA = ref(false)
@@ -46,6 +48,8 @@ export const useUserStore = defineStore('user', () => {
     isSortedBySTA,
     isSortedByETA,
     showVersionMessage,
+    selectedDate,
+    selectedDay,  
   }
 })
 
