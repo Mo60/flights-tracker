@@ -29,6 +29,11 @@ if (localStorage.getItem('listed_flights')) {
 // if (localStorage.getItem('listed_flights'))
 // user.listedFlights = JSON.parse( localStorage.getItem('listed_flights'))
 const router = useRouter()
+function arr_time_unix() {
+  if (filtered_flight[0].time.other.eta)
+    return filtered_flight[0].time.other.eta
+  else return filtered_flight[0].time.scheduled.arrival
+}
 function arr_time() {
   if (filtered_flight[0].time.other.eta)
     return new Date(filtered_flight[0].time.other.eta * 1000).toLocaleTimeString()
@@ -78,7 +83,7 @@ async function go() {
               status: filtered_flight[0].status.text,
               sta: STA_time(),
               sta_unix: filtered_flight[0].time.scheduled.arrival,
-              eta_unix: filtered_flight[0].time.other.eta,
+              eta_unix: arr_time_unix() ,
               aircraft: filtered_flight[0].aircraft.model.text,
             })
             // console.log(filtered_flight)
@@ -205,14 +210,17 @@ function showVersionMessage() {
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
     <div py-4 />
-    <p cursor-pointer text-blue @click="showVersionMessage"> v 0.1.7</p>
-    <div v-show="user.showVersionMessage" style="transition: width 4s;" class="bg-yellow-100 p-4 m-auto w-3/4">
+    <p cursor-pointer text-blue @click="showVersionMessage"> v 0.1.8</p>
+    <div color-black v-show="user.showVersionMessage" style="transition: width 4s;" class="bg-yellow-100 p-4 m-auto w-3/4">
       <p> </p>
+      <p> &nearr; Fixed sort by ETA </p>
+      <p> &nearr; Fixed message font color </p>
+      <p> v 0.1.7 </p>
       <p> &nearr; Added select date option </p>
-      <p> v 0.1.6</p>
+      <!-- <p> v 0.1.6</p>
       <p> &nearr; Added sort by ETA functionality </p>
       <p> &nearr; Changed table format </p>
-      <p> &nearr; Removed some messages </p>
+      <p> &nearr; Removed some messages </p> -->
     </div>
     <div py-4 />
     <!-- {{ typeof day }} -->
