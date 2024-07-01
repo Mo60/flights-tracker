@@ -1,8 +1,9 @@
 <script setup lang="ts">
 const online = useOnline()
+
+src="https://identity.netlify.com/v1/netlify-identity-widget.js">
 </script>
 
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
 <template>
   <div>
