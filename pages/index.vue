@@ -2,6 +2,8 @@
 const online = useOnline()
 </script>
 
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
 <template>
   <div>
     <!-- <Logos mb-6 /> -->
