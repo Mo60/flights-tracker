@@ -4,6 +4,8 @@ export const useUserStore = defineStore('user', () => {
   /**
    * Current named of the user.
    */
+
+  const clock_txt = ref('clock text2')
   const selectedDate =ref(new Date())
   const selectedDay = ref('')
   const showVersionMessage = ref(false)
