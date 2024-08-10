@@ -19,7 +19,7 @@ user.savedKey = localStorage.getItem('access_key')
 
 
 
-let clock_txt = 'clock txt'
+
 
 
 
@@ -208,7 +208,7 @@ function startTime() {
   let s = today.getSeconds();
   m = checkTime(m);
   s = checkTime(s);
-  this.clock_txt =  h + ":" + m + ":" + s;
+  user.clock_txt =  h + ":" + m + ":" + s;
   setTimeout(startTime, 1000);
 }
 
@@ -332,7 +332,7 @@ function checkTime(i) {
 
 <p>
 
-    {{ clock_txt }}
+    {{ usrr.clock_txt }}
 
 </p>
 
