@@ -332,7 +332,7 @@ function checkTime(i) {
 
 <p>
 
-    {{ usrr.clock_txt }}
+    {{ user.clock_txt }}
 
 </p>
 
