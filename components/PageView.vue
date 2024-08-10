@@ -16,6 +16,14 @@ const date_formated = `${year}-${month}-${day}`
 const user = useUserStore()
 user.selectedDate = new Date(year,month-1,day_number)
 user.savedKey = localStorage.getItem('access_key')
+
+
+
+let clock_txt = 'clock txt'
+
+
+
+
 let filtered_flight = []
 // console.log(localStorage.getItem('tracked_flights'))
 if (localStorage.getItem('tracked_flights'))
@@ -125,7 +133,7 @@ function save() {
   user.inputKey = ''
 }
 function addFlight() {
-  if (user.inputFlight.length > 3) {
+  if (user.inputFlight.length > 2) {
     user.trackedFlights.push(user.inputFlight)
     localStorage.setItem('tracked_flights', (user.trackedFlights))
     user.inputFlight = ''
@@ -186,6 +194,30 @@ function showVersionMessage() {
 // arr_time: new Date(filtered_flight[0].time.estimated.arrival * 1000).toLocaleString()
 // arr_time: `${new Date(filtered_flight[0].time.estimated.arrival * 1000).getHours()}:${new Date(filtered_flight[0].time.estimated.arrival * 1000).getMinutes()}`,
 </script>
+
+
+
+
+
+
+
+function startTime() {
+  const today = new Date();
+  let h = today.getHours();
+  let m = today.getMinutes();
+  let s = today.getSeconds();
+  m = checkTime(m);
+  s = checkTime(s);
+  this.clock_txt =  h + ":" + m + ":" + s;
+  setTimeout(startTime, 1000);
+}
+
+function checkTime(i) {
+  if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+  return i;
+}
+
+
 
 <template>
   <div>
@@ -295,6 +327,20 @@ function showVersionMessage() {
           Go
         </button>
       </p>
+
+
+
+<p>
+
+    {{ clock_txt }}
+
+</p>
+
+
+
+
+
+
     </div>
     <div py-4 />
     <p> Add flight to check status: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
