@@ -4,9 +4,10 @@ export const useUserStore = defineStore('user', () => {
   /**
    * Current named of the user.
    */
-
+  const indexOfClock = ref('')
+  const arrivingFlights = ref([])
   const clock_txt = ref('')
-  const selectedDate =ref(new Date())
+  const selectedDate = ref(new Date())
   const selectedDay = ref('')
   const showVersionMessage = ref(false)
   const message = ref('')
@@ -51,7 +52,10 @@ export const useUserStore = defineStore('user', () => {
     isSortedByETA,
     showVersionMessage,
     selectedDate,
-    selectedDay,  
+    selectedDay,
+    clock_txt,
+    arrivingFlights,
+    indexOfClock,
   }
 })
 

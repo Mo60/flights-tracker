@@ -30,32 +30,123 @@ if (localStorage.getItem('listed_flights')) {
 // if (localStorage.getItem('listed_flights'))
 // user.listedFlights = JSON.parse( localStorage.getItem('listed_flights'))
 const router = useRouter()
+
+async function get_all_arriving_flights() {
+  // https://flightradar243.p.rapidapi.com/v1/airports/arrivals?code=IAH&limit=100&page=1
+  let page = {
+    current: 1,
+    total: 11,
+  }
+  const flight_arriving_raw_inter = []
+  let response = [{}]
+  let flight_arriving_raw = []
+  user.listedFlights = [{ flight: 'Clock: ', eta_unix: Math.round(today_date.getTime() / 1000), sta_unix: Math.round(today_date.getTime() / 1000), status: user.clock_txt,
+  }]
+  for (let i = page.current; i <= page.total; i++) {
+    // console.log(i)
+    const options = {
+      method: 'GET',
+      url: 'https://flightradar243.p.rapidapi.com/v1/airports/arrivals?',
+      params: {
+        code: 'IAH',
+        limit: '100',
+        page: i,
+
+      },
+      headers: {
+        'X-RapidAPI-Key': user.savedKey,
+        'X-RapidAPI-Host': 'flightradar243.p.rapidapi.com',
+      },
+    }
+    response = await axios.request(options)
+    page = response.data.data.airport.pluginData.schedule.arrivals.page
+    flight_arriving_raw = flight_arriving_raw.concat(response.data.data.airport.pluginData.schedule.arrivals.data)
+  }
+  console.log(flight_arriving_raw[900].flight.airport.origin.position.country.code)
+
+  // ** remove non international flights
+
+  flight_arriving_raw = flight_arriving_raw.filter(item => !(item.flight.airport.origin.position.country.code === 'US' || item.flight.airport.origin.position.country.code === 'CA')
+  && ((new Date((item.flight.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate()))
+
+  flight_arriving_raw.sort((a, b) => {
+    if (a.flight.time.scheduled.arrival < b.flight.time.scheduled.arrival)
+      return -1
+
+    if (a.flight.time.scheduled.arrival > b.flight.time.scheduled.arrival)
+      return 1
+  })
+
+  // console.log(flight_arriving_raw)
+
+  flight_arriving_raw.forEach((element) => {
+    user.listedFlights.push({
+      airport_iata: element.flight.airport.origin.code.iata,
+      flight: element.flight.identification.number.default,
+      arr_time: arr_time2(element),
+      status: element.flight.status.text,
+      sta: STA_time2(element),
+      sta_unix: element.flight.time.scheduled.arrival,
+      eta_unix: arr_time_unix2(element),
+      aircraft: element.flight.aircraft.model.text,
+    })
+  })
+
+  // // .then(console.log(response))
+  // console.log(response)
+  // console.log(response.data.data.airport.pluginData.schedule.arrivals)
+}
+
 function arr_time_unix() {
   if (filtered_flight[0].time.other.eta)
     return filtered_flight[0].time.other.eta
   else return filtered_flight[0].time.scheduled.arrival
 }
+
+function arr_time_unix2(flight) {
+  if (flight.flight.time.other.eta)
+    return flight.flight.time.other.eta
+  else return flight.flight.time.scheduled.arrival
+}
+
 function arr_time() {
   if (filtered_flight[0].time.other.eta)
     return new Date(filtered_flight[0].time.other.eta * 1000).toLocaleTimeString()
   else return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleTimeString()
 }
+function arr_time2(flight) {
+  if (flight.flight.time.other.eta)
+    return new Date(flight.flight.time.other.eta * 1000).toLocaleTimeString()
+  else return new Date(flight.flight.time.scheduled.arrival * 1000).toLocaleTimeString()
+}
+
 function STA_time() {
   return new Date(filtered_flight[0].time.scheduled.arrival * 1000).toLocaleTimeString()
 }
+function STA_time2(flight) {
+  return new Date(flight.flight.time.scheduled.arrival * 1000).toLocaleTimeString()
+}
+
 async function go() {
   user.isSortedBySTA = false
   user.isSortedByETA = false
   user.listedFlights = []
   user.message = `last updated: ${today_date.toLocaleString()}`
   localStorage.setItem('last_updated', user.message)
-  console.log(user.message)
-  user.trackedFlights.forEach(async (item) => {
+  // console.log(user.message)
+  for (let i = 0; i < user.trackedFlights.length; i++) {
+    if (user.trackedFlights[i].toLowerCase() === 'clock') {
+      user.listedFlights.push({ flight: 'Clock: ', eta_unix: Math.round(today_date.getTime() / 1000), sta_unix: Math.round(today_date.getTime() / 1000), status: user.clock_txt,
+      })
+      user.indexOfClock = i
+      continue
+    }
+
     const options = {
       method: 'GET',
       url: 'https://flight-radar1.p.rapidapi.com/flights/get-more-info',
       params: {
-        query: item,
+        query: user.trackedFlights[i],
         fetchBy: 'flight',
         page: '1',
         limit: '100',
@@ -65,49 +156,28 @@ async function go() {
         'X-RapidAPI-Host': 'flight-radar1.p.rapidapi.com',
       },
     }
-    // console.log(user.trackedFlights.indexOf(item))
-    await new Promise(() => setTimeout(async () => {
-      // console.log("wait "+ user.trackedFlights.indexOf(item) +" sec")
-      try {
-        user.requestSent = 0
-        // console.log(item)
-        // eslint-disable-next-line no-console
-        const response = await axios.request(options).then(console.log(item))
-        // filtered_flight = await response.data.result.response.data.filter(item => (`0${new Date((item.time.scheduled.arrival) * 1000).getDate().toString()}`).slice(-2) === day)
-        filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
+    const response = await axios.request(options)
+    if (response.data.result.response.data) {
+      filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
+      user.listedFlights.push({
+        airport_iata: filtered_flight[0].airport.origin.code.iata,
+        flight: filtered_flight[0].identification.number.default,
+        arr_time: arr_time(),
+        // arr_time: filtered_flight[0].time.other.eta,
+        status: filtered_flight[0].status.text,
+        sta: STA_time(),
+        sta_unix: filtered_flight[0].time.scheduled.arrival,
+        eta_unix: arr_time_unix(),
+        aircraft: filtered_flight[0].aircraft.model.text,
+      })
+    }
+    else {
+      user.listedFlights.push({ flight: user.trackedFlights[i].toLowerCase(), sta_unix: 0, eta_unix: 0 })
+    }
 
-        // console.log(filtered_flight)
-        if (filtered_flight[0]) {
-          // eslint-disable-next-line no-async-promise-executor
-          await new Promise(async () => {
-            user.listedFlights.push({
-              airport_iata: filtered_flight[0].airport.origin.code.iata,
-              flight: filtered_flight[0].identification.number.default,
-              arr_time: arr_time(),
-              // arr_time: filtered_flight[0].time.other.eta,
-              status: filtered_flight[0].status.text,
-              sta: STA_time(),
-              sta_unix: filtered_flight[0].time.scheduled.arrival,
-              eta_unix: arr_time_unix(),
-              aircraft: filtered_flight[0].aircraft.model.text,
-            })
-            // console.log(filtered_flight)
-            localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
-            user.requestSent++
-            // await new Promise( setTimeout(() => {console.log("wait 2 sec")}, 2000))
-          })
-        }
-        // if (user.requestSent == 5 || user.requestSent == 10) {
-        //     //wait 2 sec
-        //    await new Promise( setTimeout(() => {console.log("wait 1 sec")}, 1000))
-        //    await new Promise( setTimeout(() => {console.log("wait 1 sec")}, 1000))
-        //   }
-      }
-      catch (error) {
-        console.error(error)
-      }
-    }, user.trackedFlights.indexOf(item) * 1000))
-  })
+    // console.log(i)
+  }
+  // setTimeout(go, 1000)
 
   // message = ''
   // const flight = {}
@@ -212,7 +282,18 @@ function startTime() {
   m = checkTime(m)
   s = checkTime(s)
   user.clock_txt = `${h}:${m}:${s}`
+  user.listedFlights.forEach((item, index) => {
+    // console.log(item.flight)
+    if (item.flight === 'Clock: ')
+    // user.listedFlights[index].status = user.clock_txt
+    // = { flight: 'Clock: ', eta_unix: today_date.getTime() / 1000, sta_unix: today_date.getTime() / 1000, status: user.clock_txt }
+
+      user.listedFlights[index] = { flight: 'Clock: ', eta_unix: Math.round(today_date.getTime() / 1000), sta_unix: Math.round(today_date.getTime() / 1000), status: user.clock_txt }
+  })
+
+  // user.listedFlights[user.indexOfClock] =
   setTimeout(startTime, 1000)
+  // { flight: 'Clock: ', eta_unix: today_date.getTime() / 1000, sta_unix: today_date.getTime() / 1000, status: user.clock_txt,}
 }
 
 function checkTime(i) {
@@ -263,13 +344,17 @@ startTime()
     </p>
     <div py-4 />
     <p cursor-pointer text-blue @click="showVersionMessage">
-      v 0.1.9
+      v 0.1.10
     </p>
     <div
       v-show="user.showVersionMessage" color-black style="transition: width 4s;"
       class="bg-yellow-100 p-4 m-auto w-3/4"
     >
       <p />
+      <p> v 0.1.10 </p>
+      <p> &nearr; Can add clock in list </p>
+      <p> &nearr; if flight not found the flight number will stay in table </p>
+      <p> &nearr; experimental: check all arriving international flights  </p>
       <p> v 0.1.9 </p>
       <p> &nearr; highlight flights arr next hour </p>
       <p> &nearr; color coded ETA </p>
@@ -341,6 +426,9 @@ startTime()
             <td class="border ">
               {{ flight.aircraft }}
             </td>
+            <td class="border ">
+              {{ flight.eta_unix }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -386,7 +474,7 @@ startTime()
           </option>
         </select>
 
-        <button m-3 text-sm btn @click="go">
+        <button m-3 text-sm btn @click="useTimeout(go, 1000)">
           Go
         </button>
       </p>
@@ -419,6 +507,10 @@ startTime()
         Test
       </button> -->
     </p>
+
+    <button m-3 text-sm btn bg-red @click="get_all_arriving_flights">
+      get all arriving flights (experimental)
+    </button>
     <!-- <div py-4 /> -->
     <p id="message">
       user.savedKey : {{ user.savedKey }}
