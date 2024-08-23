@@ -357,6 +357,8 @@ startTime()
       class="bg-yellow-100 p-4 m-auto w-3/4"
     >
       <p />
+      <p> v 0.1.10.1 </p>
+      <p> &nearr; tracked generated flights </p>
       <p> v 0.1.10 </p>
       <p> &nearr; Can add clock in list </p>
       <p> &nearr; if flight not found the flight number will stay in table </p>
