@@ -31,6 +31,10 @@ if (localStorage.getItem('listed_flights')) {
 // user.listedFlights = JSON.parse( localStorage.getItem('listed_flights'))
 const router = useRouter()
 
+function change_tracked_list(newList) {
+  user.trackedFlights = newList
+}
+
 async function get_all_arriving_flights() {
   // https://flightradar243.p.rapidapi.com/v1/airports/arrivals?code=IAH&limit=100&page=1
   let page = {
@@ -62,7 +66,7 @@ async function get_all_arriving_flights() {
     page = response.data.data.airport.pluginData.schedule.arrivals.page
     flight_arriving_raw = flight_arriving_raw.concat(response.data.data.airport.pluginData.schedule.arrivals.data)
   }
-  console.log(flight_arriving_raw[900].flight.airport.origin.position.country.code)
+  // console.log(flight_arriving_raw[900].flight.airport.origin.position.country.code)
 
   // ** remove non international flights
 
@@ -80,6 +84,7 @@ async function get_all_arriving_flights() {
   // console.log(flight_arriving_raw)
 
   flight_arriving_raw.forEach((element) => {
+    user.int_in_flight_api.push(element.flight.identification.number.default)
     user.listedFlights.push({
       airport_iata: element.flight.airport.origin.code.iata,
       flight: element.flight.identification.number.default,
@@ -159,6 +164,7 @@ async function go() {
     const response = await axios.request(options)
     if (response.data.result.response.data) {
       filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
+      console.log(filtered_flight)
       user.listedFlights.push({
         airport_iata: filtered_flight[0].airport.origin.code.iata,
         flight: filtered_flight[0].identification.number.default,
@@ -426,9 +432,9 @@ startTime()
             <td class="border ">
               {{ flight.aircraft }}
             </td>
-            <td class="border ">
+            <!-- <td class="border ">
               {{ flight.eta_unix }}
-            </td>
+            </td> -->
           </tr>
         </tbody>
       </table>
@@ -524,6 +530,14 @@ startTime()
     >
       {{ flight }}
     </button>
+    <div>
+      <div>
+        <!-- {{ user.int_in_flight_api }} -->
+      </div>
+      <button m-3 text-sm btn bg-red @click="change_tracked_list(user.int_in_flight_api)">
+        tracked generated flights (experimental)
+      </button>
+    </div>
     <div>
       <!-- <button
         m-3 text-sm btn
