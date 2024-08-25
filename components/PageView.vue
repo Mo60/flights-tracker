@@ -32,7 +32,7 @@ if (localStorage.getItem('listed_flights')) {
 const router = useRouter()
 
 function change_tracked_list(newList) {
-  user.trackedFlights = newList
+  user.trackedFlights = ['clock'].concat(newList)
 }
 
 async function get_all_arriving_flights() {
@@ -183,6 +183,7 @@ async function go() {
 
     // console.log(i)
   }
+
   // setTimeout(go, 1000)
 
   // message = ''
@@ -258,6 +259,27 @@ function sortByETA() {
   user.isSortedByETA = !user.isSortedByETA
   user.isSortedBySTA = false
 }
+
+function autoRefresh() {
+  if (user.autoRefresh) {
+    go()
+    console.log('refresh')
+    setTimeout(autoRefresh, 10)
+  }
+  else {
+    console.log('stop auto refresh')
+  }
+}
+
+function setAutoRefresh() {
+  // if (user.autoRefresh)
+  //   user.autoRefresh = ref(false)
+  // if (!user.autoRefresh) {
+  //   user.autoRefresh = ref(true)
+  //   autoRefresh()
+  // }
+}
+
 function showVersionMessage() {
   user.showVersionMessage = !user.showVersionMessage
 }
@@ -350,20 +372,22 @@ startTime()
     </p>
     <div py-4 />
     <p cursor-pointer text-blue @click="showVersionMessage">
-      v 0.1.10
+      v 0.1.10.2
     </p>
     <div
       v-show="user.showVersionMessage" color-black style="transition: width 4s;"
       class="bg-yellow-100 p-4 m-auto w-3/4"
     >
       <p />
+      <p> v 0.1.10.2 </p>
+      <p> &nearr;  fixed track generated flights </p>
       <p> v 0.1.10.1 </p>
-      <p> &nearr; tracked generated flights </p>
+      <p> &nearr; track generated flights </p>
       <p> v 0.1.10 </p>
       <p> &nearr; Can add clock in list </p>
       <p> &nearr; if flight not found the flight number will stay in table </p>
       <p> &nearr; experimental: check all arriving international flights  </p>
-      <p> v 0.1.9 </p>
+      <!-- <p> v 0.1.9 </p>
       <p> &nearr; highlight flights arr next hour </p>
       <p> &nearr; color coded ETA </p>
       <p> &nearr; confirm before changing Key </p>
@@ -371,7 +395,7 @@ startTime()
       <p> &nearr; Fixed last updated message doesn't change </p>
       <p> v 0.1.8 </p>
       <p> &nearr; Fixed sort by ETA </p>
-      <p> &nearr; Fixed message font color </p>
+      <p> &nearr; Fixed message font color </p> -->
       <!-- <p> v 0.1.7 </p>
       <p> &nearr; Added select date option </p> -->
       <!-- <p> v 0.1.6</p>
@@ -539,6 +563,12 @@ startTime()
       <button m-3 text-sm btn bg-red @click="change_tracked_list(user.int_in_flight_api)">
         tracked generated flights (experimental)
       </button>
+    </div>
+    <div>
+      <button m-3 text-sm btn bg-red @click="setAutoRefresh">
+        set auto refresh (experimental)
+      </button>
+      {{ user.autoRefresh }}
     </div>
     <div>
       <!-- <button
