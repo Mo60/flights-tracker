@@ -32,7 +32,9 @@ if (localStorage.getItem('listed_flights')) {
 const router = useRouter()
 
 function change_tracked_list(newList) {
+  user.trackedFlights = []
   user.trackedFlights = ['clock'].concat(newList)
+  localStorage.setItem('tracked_flights', user.trackedFlights)
 }
 
 async function get_all_arriving_flights() {
@@ -561,7 +563,7 @@ startTime()
         <!-- {{ user.int_in_flight_api }} -->
       </div>
       <button m-3 text-sm btn bg-red @click="change_tracked_list(user.int_in_flight_api)">
-        tracked generated flights (experimental)
+        track generated flights (experimental)
       </button>
     </div>
     <div>
