@@ -31,6 +31,108 @@ if (localStorage.getItem('listed_flights')) {
 // user.listedFlights = JSON.parse( localStorage.getItem('listed_flights'))
 const router = useRouter()
 
+function remove_listed_flight(flight) {
+  user.listedFlights.splice(flight, 1)
+}
+
+async function update_listed_flights() {
+  user.isSortedBySTA = false
+  user.isSortedByETA = false
+
+  user.message = `last updated: ${today_date.toLocaleString()}`
+  localStorage.setItem('last_updated', user.message)
+  // console.log(user.message)
+  for (let i = 0; i < user.listedFlights.length; i++) {
+    if (user.listedFlights[i].flight.toLowerCase() === 'clock: ') {
+      user.listedFlights[i] = {
+        flight: 'Clock: ',
+        eta_unix: Math.round(today_date.getTime() / 1000),
+        sta_unix: Math.round(today_date.getTime() / 1000),
+        status: user.clock_txt,
+      }
+      user.indexOfClock = i
+      continue
+    }
+
+    const options = {
+      method: 'GET',
+      url: 'https://flight-radar1.p.rapidapi.com/flights/get-more-info',
+      params: {
+        query: user.listedFlights[i].flight,
+        fetchBy: 'flight',
+        page: '1',
+        limit: '100',
+      },
+      headers: {
+        'X-RapidAPI-Key': user.savedKey,
+        'X-RapidAPI-Host': 'flight-radar1.p.rapidapi.com',
+      },
+    }
+    // console.log(user.listedFlights[i].flight)
+    const response = await axios.request(options)
+    if (response.data.result.response.data) {
+      filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
+      // console.log(filtered_flight)
+      user.listedFlights[i] = {
+        airport_iata: filtered_flight[0].airport.origin.code.iata,
+        flight: filtered_flight[0].identification.number.default,
+        arr_time: arr_time(),
+        // arr_time: filtered_flight[0].time.other.eta,
+        status: filtered_flight[0].status.text,
+        // sta: 'new',
+        sta: STA_time(),
+        sta_unix: filtered_flight[0].time.scheduled.arrival,
+        eta_unix: arr_time_unix(),
+        aircraft: filtered_flight[0].aircraft.model.text,
+        airport_text: filtered_flight[0].airport.origin.name,
+      }
+    }
+    else {
+      user.listedFlights.push({ flight: user.listedFlights[i].flight.toLowerCase(), sta_unix: 0, eta_unix: 0 })
+    }
+
+    // console.log(i)
+  }
+}
+
+async function update_one_flight(flightNumber, index) {
+  const options = {
+    method: 'GET',
+    url: 'https://flight-radar1.p.rapidapi.com/flights/get-more-info',
+    params: {
+      query: flightNumber,
+      fetchBy: 'flight',
+      page: '1',
+      limit: '100',
+    },
+    headers: {
+      'X-RapidAPI-Key': user.savedKey,
+      'X-RapidAPI-Host': 'flight-radar1.p.rapidapi.com',
+    },
+  }
+  const response = await axios.request(options)
+  if (response.data.result.response.data) {
+    filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
+    // console.log()
+    user.listedFlights[index] = {
+      airport_iata: filtered_flight[0].airport.origin.code.iata,
+      flight: filtered_flight[0].identification.number.default,
+      arr_time: arr_time(),
+      // arr_time: filtered_flight[0].time.other.eta,
+      status: filtered_flight[0].status.text,
+      // sta: 'new',
+      sta: STA_time(),
+      sta_unix: filtered_flight[0].time.scheduled.arrival,
+      eta_unix: arr_time_unix(),
+      aircraft: filtered_flight[0].aircraft.model.text,
+      airport_text: filtered_flight[0].airport.origin.name,
+    }
+  }
+  else {
+    user.listedFlights.push({ flight: user.trackedFlights[i].toLowerCase(), sta_unix: 0, eta_unix: 0 })
+  }
+}
+
 function change_tracked_list(newList) {
   user.trackedFlights = []
   user.trackedFlights = ['clock'].concat(newList)
@@ -46,7 +148,11 @@ async function get_all_arriving_flights() {
   const flight_arriving_raw_inter = []
   let response = [{}]
   let flight_arriving_raw = []
-  user.listedFlights = [{ flight: 'Clock: ', eta_unix: Math.round(today_date.getTime() / 1000), sta_unix: Math.round(today_date.getTime() / 1000), status: user.clock_txt,
+  user.listedFlights = [{
+    flight: 'Clock: ',
+    eta_unix: Math.round(today_date.getTime() / 1000),
+    sta_unix: Math.round(today_date.getTime() / 1000),
+    status: user.clock_txt,
   }]
   for (let i = page.current; i <= page.total; i++) {
     // console.log(i)
@@ -86,6 +192,7 @@ async function get_all_arriving_flights() {
   // console.log(flight_arriving_raw)
 
   flight_arriving_raw.forEach((element) => {
+    // console.log(element.flight.identification.number.default)
     user.int_in_flight_api.push(element.flight.identification.number.default)
     user.listedFlights.push({
       airport_iata: element.flight.airport.origin.code.iata,
@@ -95,7 +202,8 @@ async function get_all_arriving_flights() {
       sta: STA_time2(element),
       sta_unix: element.flight.time.scheduled.arrival,
       eta_unix: arr_time_unix2(element),
-      aircraft: element.flight.aircraft.model.text,
+      aircraft: element.flight.aircraft.model.text || '',
+      airport_text: element.flight.airport.origin.name,
     })
   })
 
@@ -143,7 +251,11 @@ async function go() {
   // console.log(user.message)
   for (let i = 0; i < user.trackedFlights.length; i++) {
     if (user.trackedFlights[i].toLowerCase() === 'clock') {
-      user.listedFlights.push({ flight: 'Clock: ', eta_unix: Math.round(today_date.getTime() / 1000), sta_unix: Math.round(today_date.getTime() / 1000), status: user.clock_txt,
+      user.listedFlights.push({
+        flight: 'Clock: ',
+        eta_unix: Math.round(today_date.getTime() / 1000),
+        sta_unix: Math.round(today_date.getTime() / 1000),
+        status: user.clock_txt,
       })
       user.indexOfClock = i
       continue
@@ -177,6 +289,7 @@ async function go() {
         sta_unix: filtered_flight[0].time.scheduled.arrival,
         eta_unix: arr_time_unix(),
         aircraft: filtered_flight[0].aircraft.model.text,
+        airport_text: filtered_flight[0].airport.origin.name,
       })
     }
     else {
@@ -382,13 +495,13 @@ startTime()
     >
       <p />
       <p> v 0.1.10.2 </p>
-      <p> &nearr;  fixed track generated flights </p>
+      <p> &nearr; fixed track generated flights </p>
       <p> v 0.1.10.1 </p>
       <p> &nearr; track generated flights </p>
       <p> v 0.1.10 </p>
       <p> &nearr; Can add clock in list </p>
       <p> &nearr; if flight not found the flight number will stay in table </p>
-      <p> &nearr; experimental: check all arriving international flights  </p>
+      <p> &nearr; experimental: check all arriving international flights </p>
       <!-- <p> v 0.1.9 </p>
       <p> &nearr; highlight flights arr next hour </p>
       <p> &nearr; color coded ETA </p>
@@ -460,6 +573,19 @@ startTime()
             <td class="border ">
               {{ flight.aircraft }}
             </td>
+            <td class="border ">
+              <button @click="update_one_flight(flight.flight, user.listedFlights.indexOf(flight)) ">
+                <p btn i-carbon-repeat-one />
+              </button>
+              <button @click=" update_listed_flights()">
+                <p btn i-carbon-repeat />
+              </button>
+              <button @click=" remove_listed_flight(flight.flight, user.listedFlights.indexOf(flight))">
+                <p btn i-carbon-x />
+              </button>
+              {{ user.listedFlights.indexOf(flight) }}
+            </td>
+
             <!-- <td class="border ">
               {{ flight.eta_unix }}
             </td> -->
