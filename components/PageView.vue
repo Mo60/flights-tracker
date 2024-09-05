@@ -580,13 +580,13 @@ startTime()
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
     <p cursor-pointer text-blue @click="showVersionMessage">
-      v 0.1.10.2
+      v 0.2.0.1
     </p>
     <div
       v-show="user.showVersionMessage" color-black style="transition: width 4s;"
       class="bg-yellow-100 p-4 m-auto w-3/4"
     >
-      <p> v 0.2.0 </p>
+      <p> v 0.2.0.1 </p>
       <p> v 0.1.10.2 </p>
       <p> &nearr; fixed track generated flights </p>
       <p> v 0.1.10.1 </p>
