@@ -6,6 +6,10 @@ defineOptions({
 })
 // const { t } = useI18n()
 // let message =  JSON.parse(localStorage.getItem("listed_flights"))[0]
+const clientXS = 0
+const clientXE = 0
+const changeX = 0
+const fl = ''
 let today_date = new Date()
 // const date_string = date.toString() // .replace(/T/, ':').replace(/\.\w*/, '')
 const year = today_date.getFullYear().toString()
@@ -27,12 +31,56 @@ if (localStorage.getItem('listed_flights')) {
   })
   user.message = localStorage.getItem('last_updated')
 }
+if (localStorage.getItem('saved_listed_flights')) {
+  JSON.parse(localStorage.getItem('saved_listed_flights')).forEach((item) => {
+    user.savedListedFlights.push(item)
+  })
+}
 // if (localStorage.getItem('listed_flights'))
-// user.listedFlights = JSON.parse( localStorage.getItem('listed_flights'))
+//   user.listedFlights = JSON.parse(localStorage.getItem('listed_flights'))
 const router = useRouter()
+
+// function touchStart(e, fl) {
+//   clientXS = e.changedTouches[0].clientX
+//   // console.log(e.changedTouches[0].clientX)
+//   console.log(fl.flight)
+//   user.message = fl.flight
+// }
+
+// function touchEnd(e, fl) {
+//   clientXE = e.changedTouches[0].clientX
+//   changeX = clientXE - clientXS
+//   this.fl = fl.flight
+//   console.log(clientXS)
+//   console.log(clientXE)
+//   console.log(changeX)
+//   console.log(fl.flight)
+//   console.log(this.fl)
+//   user.message = user.message.concat(['', clientXS, clientXE, changeX, fl.flight, this.fl])
+// }
+
+function add_to_listed_flights(flight) {
+  if (flight.length > 2 && !user.listedFlights.find((element) => { return element.flight.toLowerCase() === flight.toLowerCase() })) {
+    user.listedFlights.push({ flight })
+    localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
+    user.newFlight.flight = ''
+    update_one_flight(flight, user.listedFlights.length - 1)
+  }
+  user.newFlight.flight = ''
+}
+
+function load_saved_listed_flights() {
+  user.listedFlights = [].concat(user.savedListedFlights)
+}
+
+function save_listed_flights(listedFlights) {
+  user.savedListedFlights = [].concat(user.listedFlights)
+  localStorage.setItem('saved_listed_flights', JSON.stringify(user.savedListedFlights))
+}
 
 function remove_listed_flight(flight) {
   user.listedFlights.splice(flight, 1)
+  localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
 }
 
 async function update_listed_flights() {
@@ -43,6 +91,7 @@ async function update_listed_flights() {
   localStorage.setItem('last_updated', user.message)
   // console.log(user.message)
   for (let i = 0; i < user.listedFlights.length; i++) {
+    user.message = `getting flight ${i + 1} out of ${user.trackedFlights.length}`
     if (user.listedFlights[i].flight.toLowerCase() === 'clock: ') {
       user.listedFlights[i] = {
         flight: 'Clock: ',
@@ -53,7 +102,9 @@ async function update_listed_flights() {
       user.indexOfClock = i
       continue
     }
-
+    user.listedFlights[i].status = '...'
+    console.log(i)
+    setTimeout(() => { console.log('wait .5 second') }, 500)
     const options = {
       method: 'GET',
       url: 'https://flight-radar1.p.rapidapi.com/flights/get-more-info',
@@ -70,9 +121,10 @@ async function update_listed_flights() {
     }
     // console.log(user.listedFlights[i].flight)
     const response = await axios.request(options)
-    if (response.data.result.response.data) {
+    if (response.data.result.response.data)
       filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
       // console.log(filtered_flight)
+    if (filtered_flight[0]) {
       user.listedFlights[i] = {
         airport_iata: filtered_flight[0].airport.origin.code.iata,
         flight: filtered_flight[0].identification.number.default,
@@ -84,18 +136,25 @@ async function update_listed_flights() {
         sta_unix: filtered_flight[0].time.scheduled.arrival,
         eta_unix: arr_time_unix(),
         aircraft: filtered_flight[0].aircraft.model.text,
-        airport_text: filtered_flight[0].airport.origin.name,
+        airport_text: filtered_flight[0].airport.origin.name || '',
+        airline_name: filtered_flight[0].airline.name || '',
+        airport_city: filtered_flight[0].airport.origin.position.region.city || '',
       }
     }
     else {
-      user.listedFlights.push({ flight: user.listedFlights[i].flight.toLowerCase(), sta_unix: 0, eta_unix: 0 })
+      user.message = `could not update FLight ${user.listedFlights[i].flight} `
     }
 
     // console.log(i)
   }
+  localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
 }
 
 async function update_one_flight(flightNumber, index) {
+// TO-DO : search bt reg number too if flight number is null like privet jets
+  user.listedFlights[index].status = '...'
+  console.log(index)
+  setTimeout(() => { console.log('wait .5 second') }, 500)
   const options = {
     method: 'GET',
     url: 'https://flight-radar1.p.rapidapi.com/flights/get-more-info',
@@ -111,9 +170,11 @@ async function update_one_flight(flightNumber, index) {
     },
   }
   const response = await axios.request(options)
-  if (response.data.result.response.data) {
+  if (response.data.result.response.data)
     filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
-    // console.log()
+    // console.log(filtered_flight)
+
+  if (filtered_flight[0]) {
     user.listedFlights[index] = {
       airport_iata: filtered_flight[0].airport.origin.code.iata,
       flight: filtered_flight[0].identification.number.default,
@@ -125,17 +186,22 @@ async function update_one_flight(flightNumber, index) {
       sta_unix: filtered_flight[0].time.scheduled.arrival,
       eta_unix: arr_time_unix(),
       aircraft: filtered_flight[0].aircraft.model.text,
-      airport_text: filtered_flight[0].airport.origin.name,
+      airport_text: filtered_flight[0].airport.origin.name || '',
+      airline_name: filtered_flight[0].airline.name || '',
+      airport_city: filtered_flight[0].airport.origin.position.region.city || '',
     }
   }
+
   else {
-    user.listedFlights.push({ flight: user.trackedFlights[i].toLowerCase(), sta_unix: 0, eta_unix: 0 })
+    user.message = `could not update Flight ${user.listedFlights[index].flight} `
   }
+  localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
 }
 
 function change_tracked_list(newList) {
-  user.trackedFlights = []
-  user.trackedFlights = ['clock'].concat(newList)
+  user.trackedFlights = ['clock']
+  user.trackedFlights = user.trackedFlights.concat(newList)
+  console.log(user.trackedFlights)
   localStorage.setItem('tracked_flights', user.trackedFlights)
 }
 
@@ -143,7 +209,7 @@ async function get_all_arriving_flights() {
   // https://flightradar243.p.rapidapi.com/v1/airports/arrivals?code=IAH&limit=100&page=1
   let page = {
     current: 1,
-    total: 11,
+    total: 9,
   }
   const flight_arriving_raw_inter = []
   let response = [{}]
@@ -155,6 +221,7 @@ async function get_all_arriving_flights() {
     status: user.clock_txt,
   }]
   for (let i = page.current; i <= page.total; i++) {
+    user.message = `loading page ${i} out of ${page.total} `
     // console.log(i)
     const options = {
       method: 'GET',
@@ -171,7 +238,7 @@ async function get_all_arriving_flights() {
       },
     }
     response = await axios.request(options)
-    page = response.data.data.airport.pluginData.schedule.arrivals.page
+    page = await response.data.data.airport.pluginData.schedule.arrivals.page
     flight_arriving_raw = flight_arriving_raw.concat(response.data.data.airport.pluginData.schedule.arrivals.data)
   }
   // console.log(flight_arriving_raw[900].flight.airport.origin.position.country.code)
@@ -181,6 +248,7 @@ async function get_all_arriving_flights() {
   flight_arriving_raw = flight_arriving_raw.filter(item => !(item.flight.airport.origin.position.country.code === 'US' || item.flight.airport.origin.position.country.code === 'CA')
   && ((new Date((item.flight.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate()))
 
+  // eslint-disable-next-line array-callback-return
   flight_arriving_raw.sort((a, b) => {
     if (a.flight.time.scheduled.arrival < b.flight.time.scheduled.arrival)
       return -1
@@ -190,13 +258,16 @@ async function get_all_arriving_flights() {
   })
 
   // console.log(flight_arriving_raw)
-
+  user.int_in_flight_api = []
   flight_arriving_raw.forEach((element) => {
+    console.log(element.flight.identification.number.default)
+    console.log(element)
+    // console.log('element.flight.identification.number.default')
     // console.log(element.flight.identification.number.default)
     user.int_in_flight_api.push(element.flight.identification.number.default)
     user.listedFlights.push({
       airport_iata: element.flight.airport.origin.code.iata,
-      flight: element.flight.identification.number.default,
+      flight: element.flight.identification.number.default ?? element.flight.aircraft.registration,
       arr_time: arr_time2(element),
       status: element.flight.status.text,
       sta: STA_time2(element),
@@ -204,8 +275,11 @@ async function get_all_arriving_flights() {
       eta_unix: arr_time_unix2(element),
       aircraft: element.flight.aircraft.model.text || '',
       airport_text: element.flight.airport.origin.name,
+      airline_name: element.flight.airline?.name ?? '__',
+      airport_city: element.flight.airport.origin.position.region.city || '',
     })
   })
+  localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
 
   // // .then(console.log(response))
   // console.log(response)
@@ -246,21 +320,38 @@ async function go() {
   user.isSortedBySTA = false
   user.isSortedByETA = false
   user.listedFlights = []
-  user.message = `last updated: ${today_date.toLocaleString()}`
-  localStorage.setItem('last_updated', user.message)
-  // console.log(user.message)
   for (let i = 0; i < user.trackedFlights.length; i++) {
     if (user.trackedFlights[i].toLowerCase() === 'clock') {
-      user.listedFlights.push({
+      user.listedFlights[i] = {
         flight: 'Clock: ',
         eta_unix: Math.round(today_date.getTime() / 1000),
         sta_unix: Math.round(today_date.getTime() / 1000),
         status: user.clock_txt,
-      })
+      }
+      continue
+    }
+    user.listedFlights[i] = {
+      flight: user.trackedFlights[i],
+      status: '...',
+    }
+  }
+
+  // console.log(user.message)
+  for (let i = 0; i < user.trackedFlights.length; i++) {
+    user.message = `getting flight ${i + 1} out of ${user.trackedFlights.length}`
+    if (user.trackedFlights[i].toLowerCase() === 'clock') {
+      user.listedFlights[i] = {
+        flight: 'Clock: ',
+        eta_unix: Math.round(today_date.getTime() / 1000),
+        sta_unix: Math.round(today_date.getTime() / 1000),
+        status: user.clock_txt,
+      }
       user.indexOfClock = i
       continue
     }
-
+    // user.listedFlights[i].status = '...'
+    console.log(i)
+    setTimeout(() => { console.log('wait .5 second') }, 500)
     const options = {
       method: 'GET',
       url: 'https://flight-radar1.p.rapidapi.com/flights/get-more-info',
@@ -278,8 +369,8 @@ async function go() {
     const response = await axios.request(options)
     if (response.data.result.response.data) {
       filtered_flight = await response.data.result.response.data.filter(item => (new Date((item.time.scheduled.arrival) * 1000).getDate()) === user.selectedDate.getDate())
-      console.log(filtered_flight)
-      user.listedFlights.push({
+      // console.log(filtered_flight)
+      user.listedFlights[i] = {
         airport_iata: filtered_flight[0].airport.origin.code.iata,
         flight: filtered_flight[0].identification.number.default,
         arr_time: arr_time(),
@@ -289,17 +380,20 @@ async function go() {
         sta_unix: filtered_flight[0].time.scheduled.arrival,
         eta_unix: arr_time_unix(),
         aircraft: filtered_flight[0].aircraft.model.text,
-        airport_text: filtered_flight[0].airport.origin.name,
-      })
+        airport_text: filtered_flight[0].airport.origin.name || '',
+        airline_name: filtered_flight[0].airline.name || '',
+        airport_city: filtered_flight[0].airport.origin.position.region.city || '',
+
+      }
     }
     else {
-      user.listedFlights.push({ flight: user.trackedFlights[i].toLowerCase(), sta_unix: 0, eta_unix: 0 })
+      user.message = `could not update FLight ${user.listedFlights[i].flight} `
     }
-
-    // console.log(i)
   }
+  localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
+  setTimeout(() => { console.log('wait 1.5 second'); user.message = `last updated: ${today_date.toLocaleString()}` }, 1500)
 
-  // setTimeout(go, 1000)
+  localStorage.setItem('last_updated', user.message)
 
   // message = ''
   // const flight = {}
@@ -482,10 +576,9 @@ startTime()
     <!-- {{ user.selectedDate }} -->
     <!-- <p> flight tracking page</p> -->
     <p>
-      Page's under construction
+      <!-- Page's under construction -->
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
-    <div py-4 />
     <p cursor-pointer text-blue @click="showVersionMessage">
       v 0.1.10.2
     </p>
@@ -493,15 +586,15 @@ startTime()
       v-show="user.showVersionMessage" color-black style="transition: width 4s;"
       class="bg-yellow-100 p-4 m-auto w-3/4"
     >
-      <p />
+      <p> v 0.2.0 </p>
       <p> v 0.1.10.2 </p>
       <p> &nearr; fixed track generated flights </p>
       <p> v 0.1.10.1 </p>
       <p> &nearr; track generated flights </p>
-      <p> v 0.1.10 </p>
+      <!-- <p> v 0.1.10 </p>
       <p> &nearr; Can add clock in list </p>
       <p> &nearr; if flight not found the flight number will stay in table </p>
-      <p> &nearr; experimental: check all arriving international flights </p>
+      <p> &nearr; experimental: check all arriving international flights </p> -->
       <!-- <p> v 0.1.9 </p>
       <p> &nearr; highlight flights arr next hour </p>
       <p> &nearr; color coded ETA </p>
@@ -518,83 +611,120 @@ startTime()
       <p> &nearr; Changed table format </p>
       <p> &nearr; Removed some messages </p> -->
     </div>
-    <div py-4 />
     <!-- {{ typeof day }} -->
 
     <div>
-      <table class=" m-auto">
-        <!-- m-auto  rounded shadow-md"> -->
-        <thead>
-          <tr>
-            <th class="border bg-gray">
-              <p i-carbon-departure />
-            </th>
-            <th class="border border-gray-300 bg-gray">
-              <!-- w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4"> -->
-              Flight
-            </th>
-            <th class="border bg-gray " @click="sortBySTA">
-              STA
-              <p v-if="user.isSortedBySTA" btn i-carbon-arrow-down />
-              <p v-else btn i-carbon-dot-mark />
-            </th>
-            <th class="border bg-gray " @click="sortByETA">
-              ETA
-              <p v-if="user.isSortedByETA" btn i-carbon-arrow-down />
-              <p v-else btn i-carbon-dot-mark />
-            </th>
-            <th class="border bg-gray">
-              Status
-            </th>
-            <th v-show="true" class="border bg-gray">
-              Aircraft
-            </th>
-          </tr>
-        </thead>
-        <!-- use the filtered list -->
-        <tbody v-for="flight in user.listedFlights" :key="flight._id">
-          <tr :class="[{ ['bg-yellow-7']: Math.abs(flight.eta_unix - today_date.getTime() / 1000) < 3600.000 }]">
-            <td class="border">
-              {{ flight.airport_iata }}
-            </td>
-            <td class="border">
-              <!-- w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4 -->
-              {{ flight.flight }}
-            </td>
-            <td class="border">
-              {{ flight.sta }}
-            </td>
-            <td :class="etaTxtClass(flight)" class="border">
-              {{ flight.arr_time }}
-            </td>
-            <td class="border">
-              {{ flight.status }}
-            </td>
-            <td class="border ">
-              {{ flight.aircraft }}
-            </td>
-            <td class="border ">
-              <button @click="update_one_flight(flight.flight, user.listedFlights.indexOf(flight)) ">
-                <p btn i-carbon-repeat-one />
-              </button>
-              <button @click=" update_listed_flights()">
-                <p btn i-carbon-repeat />
-              </button>
-              <button @click=" remove_listed_flight(flight.flight, user.listedFlights.indexOf(flight))">
-                <p btn i-carbon-x />
-              </button>
-              {{ user.listedFlights.indexOf(flight) }}
-            </td>
+      <div max-h-lg overflow-auto m-5>
+        <table class=" m-auto">
+          <!-- m-auto  rounded shadow-md"> -->
+          <thead top-0px position-sticky>
+            <tr>
+              <th class="border bg-gray">
+                <p i-carbon-departure />
+              </th>
+              <th class="border border-gray-300 bg-gray">
+                <!-- w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4"> -->
+                Flight
+              </th>
+              <th class="border bg-gray " @click="sortBySTA">
+                STA
+                <p v-if="user.isSortedBySTA" btn i-carbon-arrow-down />
+                <p v-else btn i-carbon-dot-mark />
+              </th>
+              <th class="border bg-gray " @click="sortByETA">
+                ETA
+                <p v-if="user.isSortedByETA" btn i-carbon-arrow-down />
+                <p v-else btn i-carbon-dot-mark />
+              </th>
+              <th class="border bg-gray">
+                Status
+              </th>
+              <th v-show="true" class="border bg-gray">
+                Aircraft
+              </th>
+              <th class="border bg-gray" />
+            </tr>
+          </thead>
+          <!-- use the filtered list -->
+          <tbody v-for="flight in user.listedFlights" :key="flight._id">
+            <tr>
+              <td class="border" :class="[{ ['bg-yellow-7']: Math.abs(flight.eta_unix - today_date.getTime() / 1000) < 3600.000 }]">
+                <p py-1 cursor-pointer @click="() => { flight.show = !flight.show }">
+                  {{ flight.airport_iata }}
+                </p>
+              </td>
+              <td class="border">
+                <!-- w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4 -->
+                {{ flight.flight }}
+              </td>
+              <td class="border">
+                {{ flight.sta }}
+              </td>
+              <td :class="etaTxtClass(flight)" class="border">
+                {{ flight.arr_time }}
+              </td>
+              <td class="border">
+                {{ flight.status }}
+              </td>
+              <td class="border ">
+                {{ flight.aircraft }}
+              </td>
+              <td class="border ">
+                <p btn bg-rose i-carbon-x @click="remove_listed_flight(user.listedFlights.indexOf(flight))" />
+              <!-- {{ user.listedFlights.indexOf(flight) }} -->
+              </td>
 
             <!-- <td class="border ">
               {{ flight.eta_unix }}
             </td> -->
+            </tr>
+            <tr>
+              <td v-if="flight.show" class="border" colspan="6">
+                <!-- {{ flight.airport_text }} -->
+                {{ ` ${flight.airline_name} , ${flight.airport_city}, ` }}
+                <p>{{ flight.aircraft }}</p>
+
+                <!-- <p i-carbon-arrow-down /> -->
+                <p>
+                  <button @click="update_one_flight(flight.flight, user.listedFlights.indexOf(flight)) ">
+                    <p btn i-carbon-repeat-one />
+                  </button>
+                  <button @click=" update_listed_flights()">
+                    <p btn i-carbon-repeat />
+                  </button>
+                  <button @click=" remove_listed_flight(user.listedFlights.indexOf(flight))">
+                    <p btn bg-rose i-carbon-x />
+                  </button>
+                </p>
+              </td>
+            </tr>
+          </tbody>
+          <tr class="border">
+            <td class="border">
+              <!-- td1 -->
+            </td>
+            <td class="border">
+              <input v-model="user.newFlight.flight" text-black w-full class="border" placeholder="new flight: " @keydown.enter="add_to_listed_flights(user.newFlight.flight)">
+            </td>
+            <td class="border">
+              <!-- td3 -->
+            </td>
+            <td class="border">
+              <!-- td4 -->
+              <button btn @click="add_to_listed_flights(user.newFlight.flight)">
+                Add
+              </button>
+            </td>
+            <td class="border">
+              <!-- td5 -->
+            </td>
           </tr>
-        </tbody>
-      </table>
-      <div py-4 />
+          <tr> &nbsp; </tr>
+        </table>
+      </div>
+      <div py-2 />
       <p text-4xl>
-        Clock: {{ user.clock_txt }}
+        {{ user.clock_txt }}
       </p>
       <div py-4 />
       <!-- {{ user.listedFlights }} -->
@@ -679,7 +809,7 @@ startTime()
       user.trackedFlights : click to delete
     </p>
     <button
-      v-for="flight in user.trackedFlights" :key="flight._id" m-1 bg-red
+      v-for="flight in user.trackedFlights" :key="flight" m-1 bg-red
       @click="del(user.trackedFlights.indexOf(flight))"
     >
       {{ flight }}
@@ -692,20 +822,26 @@ startTime()
         track generated flights (experimental)
       </button>
     </div>
-    <div>
+    <button btn @click="load_saved_listed_flights()">
+      use saved listed flights
+    </button>
+    <button btn @click="save_listed_flights()">
+      save listed flights
+    </button>
+    <!-- <div>
       <button m-3 text-sm btn bg-red @click="setAutoRefresh">
         set auto refresh (experimental)
       </button>
       {{ user.autoRefresh }}
-    </div>
-    <div>
-      <!-- <button
+    </div> -->
+    <!-- <div> -->
+    <!-- <button
         m-3 text-sm btn
         @click="go_home"
       >
         Home
       </button> -->
-    </div>
+    <!-- </div> -->
   </div>
 </template>
 

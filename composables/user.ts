@@ -4,6 +4,10 @@ export const useUserStore = defineStore('user', () => {
   /**
    * Current named of the user.
    */
+  const newFlight = ref({
+    flight: '',
+  })
+  const savedListedFlights = ref([])
   const autoRefresh = ref(false)
   const trackedFlightsSet = ref([])
   const listedFlightsSet = ref([])
@@ -64,6 +68,8 @@ export const useUserStore = defineStore('user', () => {
     trackedFlightsSet,
     listedFlightsSet,
     autoRefresh,
+    savedListedFlights,
+    newFlight,
   }
 })
 
