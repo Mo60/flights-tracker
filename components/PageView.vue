@@ -19,7 +19,8 @@ const day_number = today_date.getDate()
 const date_formated = `${year}-${month}-${day}`
 const user = useUserStore()
 user.selectedDate = new Date(year, month - 1, day_number)
-user.savedKey = localStorage.getItem('access_key')
+if (localStorage.getItem('access_key'))
+  user.savedKey = localStorage.getItem('access_key')
 
 let filtered_flight = []
 // console.log(localStorage.getItem('tracked_flights'))
