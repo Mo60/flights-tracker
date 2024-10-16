@@ -23,7 +23,7 @@ export const useUserStore = defineStore('user', () => {
   const isSortedBySTA = ref(false)
   const requestSent = ref()
   const listedFlights = ref([])
-  const savedKey = ref('')
+  const savedKey = ref('af71d22738msh8540153c65ab160p1cce13jsn49331bf8ebf5')
   const inputKey = ref('')
   const inputFlight = ref('')
   const trackedFlights = ref([])
