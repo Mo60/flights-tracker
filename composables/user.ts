@@ -7,6 +7,8 @@ export const useUserStore = defineStore('user', () => {
   const newFlight = ref({
     flight: '',
   })
+  const inputAirport = ref('')
+  const airport_icao = ref('KIAH')
   const savedListedFlights = ref([])
   const autoRefresh = ref(false)
   const trackedFlightsSet = ref([])
@@ -19,6 +21,7 @@ export const useUserStore = defineStore('user', () => {
   const selectedDay = ref('')
   const showVersionMessage = ref(false)
   const message = ref('')
+  const isSortedByActualIn = ref(false)
   const isSortedByETA = ref(false)
   const isSortedBySTA = ref(false)
   const requestSent = ref()
@@ -56,6 +59,7 @@ export const useUserStore = defineStore('user', () => {
     inputFlight,
     listedFlights,
     requestSent,
+    isSortedByActualIn,
     isSortedBySTA,
     isSortedByETA,
     showVersionMessage,
@@ -70,6 +74,8 @@ export const useUserStore = defineStore('user', () => {
     autoRefresh,
     savedListedFlights,
     newFlight,
+    airport_icao,
+    inputAirport,
   }
 })
 

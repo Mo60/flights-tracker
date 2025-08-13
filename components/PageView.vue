@@ -10,6 +10,8 @@ const clientXS = 0
 const clientXE = 0
 const changeX = 0
 const fl = ''
+// const server = 'http://localhost:3001'
+const server = '/aeroapi'
 let today_date = new Date()
 // const date_string = date.toString() // .replace(/T/, ':').replace(/\.\w*/, '')
 const year = today_date.getFullYear().toString()
@@ -19,6 +21,10 @@ const day_number = today_date.getDate()
 const date_formated = `${year}-${month}-${day}`
 const user = useUserStore()
 user.selectedDate = new Date(year, month - 1, day_number)
+
+if (localStorage.getItem('airport_icao'))
+  user.airport_icao = localStorage.getItem('airport_icao')
+
 if (localStorage.getItem('access_key'))
   user.savedKey = localStorage.getItem('access_key')
 
@@ -27,12 +33,14 @@ let filtered_flight = []
 if (localStorage.getItem('tracked_flights'))
   user.trackedFlights = user.trackedFlights.concat(localStorage.getItem('tracked_flights').split(',').filter(item => !user.trackedFlights.includes(item)))
 if (localStorage.getItem('listed_flights')) {
+  user.listedFlights = []
   JSON.parse(localStorage.getItem('listed_flights')).forEach((item) => {
     user.listedFlights.push(item)
   })
   user.message = localStorage.getItem('last_updated')
 }
 if (localStorage.getItem('saved_listed_flights')) {
+  user.savedListedFlights = []
   JSON.parse(localStorage.getItem('saved_listed_flights')).forEach((item) => {
     user.savedListedFlights.push(item)
   })
@@ -60,6 +68,107 @@ const router = useRouter()
 //   user.message = user.message.concat(['', clientXS, clientXE, changeX, fl.flight, this.fl])
 // }
 
+// ----------------------------------
+async function test() {
+
+}
+async function filterFlights(flights) {
+  // console.log(flights[0].origin.code_icao[0])
+  return await flights.filter(item => !(item.origin.code_icao[0] === 'K' || item.origin.code_icao[0] === 'C'))
+  // || item.flight.airport.origin.position.country.code === 'CA')
+}
+
+async function getNextPageAeroApi(url, response, params, i, endpiont, l) {
+  if (i < 100 && response.links) {
+    console.log(`get page ${i}`)
+    console.log('wait 7 seconds')
+    user.message = `get page ${i} in ${endpiont}`
+    i++
+    setTimeout(async () => {
+      url = `/aeroapi${response.links.next}`
+      // console.log(url)
+      // response = await axios.get(server + url)
+      response = await $fetch(server, { params: { url } })
+      pushFlightsFromAeroApi(response[endpiont])
+      await getNextPageAeroApi (url, response, params, i, endpiont, l)
+    }, 7000)
+  }
+  else if (l === 0) { useTimeout(await aeroApiScheduled('arrivals', 1), 7000) }
+  else { user.message = 'Done Done!!' }
+}
+async function pushFlightsFromAeroApi(results) {
+  const flights = await filterFlights(results)
+  // const flights = await results
+  flights.forEach((element) => {
+    // console.log(element)
+    user.int_in_flight_api.push(element.ident_iata)
+    user.listedFlights.push({
+      airport_iata: element.origin.code_iata,
+      flight: element.ident_iata ?? element.registration,
+      arr_time: new Date(element.estimated_on).toTimeString().split(' ')[0],
+      status: element.status,
+      sta: new Date(element.scheduled_on).toTimeString().split(' ')[0],
+      sta_unix: new Date(element.scheduled_on).getTime() / 1000,
+      eta_unix: new Date(element.estimated_on).getTime() / 1000,
+      aircraft: element.gate_destination || '',
+      airport_text: element.origin.name,
+      airline_name: element.operator ?? '__',
+      airport_city: element.origin.city || '',
+      scheduled_in: new Date(element.scheduled_in).toTimeString().split(' ')[0],
+      estimated_in: new Date(element.estimated_in).toTimeString().split(' ')[0],
+      ...(element.actual_in && { actual_in: new Date(element.actual_in).toTimeString().split(' ')[0] }),
+      scheduled_in_unix: new Date(element.scheduled_in).getTime() / 1000,
+      estimated_in_unix: new Date(element.estimated_in).getTime() / 1000,
+      ...(element.actual_in && { actual_in_unix: new Date(element.actual_in).getTime() / 1000 }),
+    })
+  })
+  localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
+}
+
+async function aeroApiScheduled(endpiont, l) {
+  user.isSortedBySTA = false
+  user.isSortedByETA = false
+  user.isSortedByActualIn = false
+  user.message = `getting ${endpiont} ....`
+  const airport_icao = user.airport_icao || 'KIAH'
+  const url = `/aeroapi/airports/${airport_icao}/flights/${endpiont}`
+  const params = {
+    start: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), 11, 0).toISOString(),
+    end: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), 23, 0).toISOString(),
+    max_pages: '1',
+    url,
+  }
+  try {
+    // const response = await axios.get(server + url, { params })
+    const response = await $fetch(server, { method: 'GET', params })
+    // console.log(response)
+    // console.log(response.data.scheduled_arrivals[0].estimated_on.split('T')[1])
+    // console.log(response.data.scheduled_arrivals.length)
+    if (l === 0) {
+      user.listedFlights = [{
+        flight: 'Clock: ',
+        eta_unix: Math.round(today_date.getTime() / 1000),
+        sta_unix: Math.round(today_date.getTime() / 1000),
+        status: user.clock_txt,
+      }]
+    }
+
+    // console.log(response)
+
+    await pushFlightsFromAeroApi(response[endpiont])
+
+    await getNextPageAeroApi (url, response, params, 2, endpiont, l)
+
+    user.message = 'Done!'
+  }
+  catch (error) {
+    // console.log(error)
+  }
+}
+// _________________________
+
+// -----------------------------------------------------------------------------------------------------------------///
+
 function add_to_listed_flights(flight) {
   if (flight.length > 2 && !user.listedFlights.find((element) => { return element.flight.toLowerCase() === flight.toLowerCase() })) {
     user.listedFlights.push({ flight })
@@ -74,7 +183,7 @@ function load_saved_listed_flights() {
   user.listedFlights = [].concat(user.savedListedFlights)
 }
 
-function save_listed_flights(listedFlights) {
+function save_listed_flights() {
   user.savedListedFlights = [].concat(user.listedFlights)
   localStorage.setItem('saved_listed_flights', JSON.stringify(user.savedListedFlights))
 }
@@ -87,6 +196,7 @@ function remove_listed_flight(flight) {
 async function update_listed_flights() {
   user.isSortedBySTA = false
   user.isSortedByETA = false
+  user.isSortedByActualIn = false
 
   user.message = `last updated: ${today_date.toLocaleString()}`
   localStorage.setItem('last_updated', user.message)
@@ -104,7 +214,7 @@ async function update_listed_flights() {
       continue
     }
     user.listedFlights[i].status = '...'
-    console.log(i)
+    // console.log(i)
     setTimeout(() => { console.log('wait .5 second') }, 500)
     const options = {
       method: 'GET',
@@ -154,7 +264,7 @@ async function update_listed_flights() {
 async function update_one_flight(flightNumber, index) {
 // TO-DO : search bt reg number too if flight number is null like privet jets
   user.listedFlights[index].status = '...'
-  console.log(index)
+  // console.log(index)
   setTimeout(() => { console.log('wait .5 second') }, 500)
   const options = {
     method: 'GET',
@@ -202,7 +312,7 @@ async function update_one_flight(flightNumber, index) {
 function change_tracked_list(newList) {
   user.trackedFlights = ['clock']
   user.trackedFlights = user.trackedFlights.concat(newList)
-  console.log(user.trackedFlights)
+  // console.log(user.trackedFlights)
   localStorage.setItem('tracked_flights', user.trackedFlights)
 }
 
@@ -261,8 +371,8 @@ async function get_all_arriving_flights() {
   // console.log(flight_arriving_raw)
   user.int_in_flight_api = []
   flight_arriving_raw.forEach((element) => {
-    console.log(element.flight.identification.number.default)
-    console.log(element)
+    // console.log(element.flight.identification.number.default)
+    // console.log(element)
     // console.log('element.flight.identification.number.default')
     // console.log(element.flight.identification.number.default)
     user.int_in_flight_api.push(element.flight.identification.number.default)
@@ -320,6 +430,7 @@ function STA_time2(flight) {
 async function go() {
   user.isSortedBySTA = false
   user.isSortedByETA = false
+  user.isSortedByActualIn = false
   user.listedFlights = []
   for (let i = 0; i < user.trackedFlights.length; i++) {
     if (user.trackedFlights[i].toLowerCase() === 'clock') {
@@ -351,7 +462,7 @@ async function go() {
       continue
     }
     // user.listedFlights[i].status = '...'
-    console.log(i)
+    // console.log(i)
     setTimeout(() => { console.log('wait .5 second') }, 500)
     const options = {
       method: 'GET',
@@ -404,9 +515,12 @@ async function go() {
   // return this.respond_1.data.find(
   //   'flight_date', '2024-04-14')
 }
+// testing
 function del(index) {
-  user.trackedFlights.splice(index, 1)
-  localStorage.setItem('tracked_flights', user.trackedFlights)
+  // console.log(user.selectedDate.toISOString())
+  // console.log(new Date('2025-05-28T16:00:00Z').getTime() / 1000)
+  // user.trackedFlights.splice(index, 1)
+  // localStorage.setItem('tracked_flights', user.trackedFlights)
 }
 function save() {
   if (confirm(`Change API Key to: " ${user.inputKey} " ?`)) {
@@ -414,6 +528,12 @@ function save() {
     localStorage.setItem('access_key', user.inputKey)
     user.inputKey = ''
   }
+}
+
+function changeAirport() {
+  user.airport_icao = user.inputAirport
+  localStorage.setItem('airport_icao', user.inputAirport)
+  user.inputKey = ''
 }
 
 function save_key(new_api_key) {
@@ -450,6 +570,7 @@ function sortBySTA() {
   }
   user.isSortedBySTA = !user.isSortedBySTA
   user.isSortedByETA = false
+  user.isSortedByActualIn = false
 }
 function sortByETA() {
   // console.log('sortBYSTA pressed')
@@ -468,6 +589,27 @@ function sortByETA() {
   }
   user.isSortedByETA = !user.isSortedByETA
   user.isSortedBySTA = false
+  user.isSortedByActualIn = false
+}
+
+function sortByAcualIn() {
+  // console.log('sortBYSTA pressed')
+  if (!user.isSortedByActualIn) {
+    // eslint-disable-next-line array-callback-return
+    user.listedFlights.sort((a, b) => {
+      if (a.actual_in_unix < b.actual_in_unix)
+        return -1
+
+      if (a.actual_in_unix > b.actual_in_unix)
+        return 1
+    })
+  }
+  else {
+    user.listedFlights.sort().reverse()
+  }
+  user.isSortedByActualIn = !user.isSortedByActualIn
+  user.isSortedBySTA = false
+  user.isSortedByETA = false
 }
 
 function autoRefresh() {
@@ -581,18 +723,26 @@ startTime()
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
     <p cursor-pointer text-blue @click="showVersionMessage">
-      v 0.2.1.1
+      V 0.3.0.0
     </p>
     <div
       v-show="user.showVersionMessage" color-black style="transition: width 4s;"
       class="bg-yellow-100 p-4 m-auto w-3/4"
     >
-      <p> v 0.2.1.1 </p>
-      fixed default access key
+      <p> V 0.3.0.0 </p>
+      <p> &nearr; only AeroAPI button works as it is</p>
+      <p> &nearr; now using AeroAPI from flightAware </p>
+      <p>
+        &nearr; it is still possible to use olg function but user has to
+        provide own rapid api key
+      </p>
+      <p> &nearr; </p>
+      <!-- <p> v 0.2.1.1 </p>
+      <p> &nearr;fixed default access key </p>
       <p> v 0.1.10.2 </p>
       <p> &nearr; fixed track generated flights </p>
       <p> v 0.1.10.1 </p>
-      <p> &nearr; track generated flights </p>
+      <p> &nearr; track generated flights </p> -->
       <!-- <p> v 0.1.10 </p>
       <p> &nearr; Can add clock in list </p>
       <p> &nearr; if flight not found the flight number will stay in table </p>
@@ -638,11 +788,20 @@ startTime()
                 <p v-if="user.isSortedByETA" btn i-carbon-arrow-down />
                 <p v-else btn i-carbon-dot-mark />
               </th>
-              <th class="border bg-gray">
-                Status
+
+              <th v-show="true" class="border bg-gray">
+                Sch_in
               </th>
               <th v-show="true" class="border bg-gray">
-                Aircraft
+                Ested_in
+              </th>
+              <th v-show="true" class="border bg-gray" @click="sortByAcualIn">
+                Acl_in
+                <p v-if="user.isSortedByActualIn" btn i-carbon-arrow-down />
+                <p v-else btn i-carbon-dot-mark />
+              </th>
+              <th class="border bg-gray">
+                Status
               </th>
               <th class="border bg-gray" />
             </tr>
@@ -665,11 +824,18 @@ startTime()
               <td :class="etaTxtClass(flight)" class="border">
                 {{ flight.arr_time }}
               </td>
-              <td class="border">
-                {{ flight.status }}
+
+              <td class="border ">
+                {{ flight.scheduled_in }}
               </td>
               <td class="border ">
-                {{ flight.aircraft }}
+                {{ flight.estimated_in }}
+              </td>
+              <td class="border " :class="[{ ['bg-yellow-7']: ((today_date.getTime() / 1000 - flight.actual_in_unix) > 600.000) && ((today_date.getTime() / 1000 - flight.actual_in_unix) < 1200.000) }]">
+                {{ flight.actual_in }}
+              </td>
+              <td class="border">
+                {{ flight.status }}
               </td>
               <td class="border ">
                 <p btn bg-rose i-carbon-x @click="remove_listed_flight(user.listedFlights.indexOf(flight))" />
@@ -725,6 +891,30 @@ startTime()
         </table>
       </div>
       <div py-2 />
+      <button m-3 text-sm btn @click="useTimeout(aeroApiScheduled('scheduled_arrivals', 0), 1000)">
+        AeroAPI
+      </button>
+      <button m-3 text-sm btn @click="useTimeout(test(), 1000)">
+        Test
+      </button>
+      <p>
+        {{ user.airport_icao }}
+        <input
+          id="input" v-model="user.inputAirport" placeholder="enter icao code" autocomplete="true" type="text"
+          v-bind="$attrs" p="x-4 y-2" w="150px" text="center" bg="transparent" border="~ rounded gray-200 dark:gray-700"
+          outline="none active:none" @keydown.enter="changeAirport"
+        >
+        <button m-3 text-sm btn @click="changeAirport">
+          Change
+        </button>
+
+      <!-- <button
+        m-3 text-sm btn
+        @click="test"
+      >
+        Test
+      </button> -->
+      </p>
       <p text-4xl>
         {{ user.clock_txt }}
       </p>
