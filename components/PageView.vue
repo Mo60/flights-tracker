@@ -105,18 +105,18 @@ async function pushFlightsFromAeroApi(results) {
     user.listedFlights.push({
       airport_iata: element.origin.code_iata,
       flight: element.ident_iata ?? element.registration,
-      arr_time: new Date(element.estimated_on).toTimeString().split(' ')[0],
+      arr_time: new Date(element.estimated_on).toTimeString().split(' ')[0].slice(0, 5),
       status: element.status,
-      sta: new Date(element.scheduled_on).toTimeString().split(' ')[0],
+      sta: new Date(element.scheduled_on).toTimeString().split(' ')[0].slice(0, 5),
       sta_unix: new Date(element.scheduled_on).getTime() / 1000,
       eta_unix: new Date(element.estimated_on).getTime() / 1000,
       aircraft: element.gate_destination || '',
       airport_text: element.origin.name,
       airline_name: element.operator ?? '__',
       airport_city: element.origin.city || '',
-      scheduled_in: new Date(element.scheduled_in).toTimeString().split(' ')[0],
-      estimated_in: new Date(element.estimated_in).toTimeString().split(' ')[0],
-      ...(element.actual_in && { actual_in: new Date(element.actual_in).toTimeString().split(' ')[0] }),
+      scheduled_in: new Date(element.scheduled_in).toTimeString().split(' ')[0].slice(0, 5),
+      estimated_in: new Date(element.estimated_in).toTimeString().split(' ')[0].slice(0, 5),
+      ...(element.actual_in && { actual_in: new Date(element.actual_in).toTimeString().split(' ')[0].slice(0, 5) }),
       scheduled_in_unix: new Date(element.scheduled_in).getTime() / 1000,
       estimated_in_unix: new Date(element.estimated_in).getTime() / 1000,
       ...(element.actual_in && { actual_in_unix: new Date(element.actual_in).getTime() / 1000 }),
@@ -723,12 +723,15 @@ startTime()
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
     <p cursor-pointer text-blue @click="showVersionMessage">
-      V 0.3.0.0
+      V 0.3.0.1
     </p>
     <div
       v-show="user.showVersionMessage" color-black style="transition: width 4s;"
       class="bg-yellow-100 p-4 m-auto w-3/4"
     >
+      <p> V 0.3.0.1 </p>
+      <p> &nearr; UI changes and changes time format </p>
+
       <p> V 0.3.0.0 </p>
       <p> &nearr; only AeroAPI button works as it is</p>
       <p> &nearr; now using AeroAPI from flightAware </p>
@@ -767,7 +770,7 @@ startTime()
 
     <div>
       <div max-h-lg overflow-auto m-5>
-        <table class=" m-auto">
+        <table class=" m-auto border ">
           <!-- m-auto  rounded shadow-md"> -->
           <thead top-0px position-sticky>
             <tr>
@@ -775,8 +778,7 @@ startTime()
                 <p i-carbon-departure />
               </th>
               <th class="border border-gray-300 bg-gray">
-                <!-- w-1/3 border border-r-0 border-gray-300 bg-gray p-4 font-normal sm:w-1/4"> -->
-                Flight
+                <!-- Flight -->
               </th>
               <th class="border bg-gray " @click="sortBySTA">
                 STA
@@ -790,18 +792,18 @@ startTime()
               </th>
 
               <th v-show="true" class="border bg-gray">
-                Sch_in
+                <!-- Sch_in -->
               </th>
               <th v-show="true" class="border bg-gray">
-                Ested_in
+                <!-- Ested_in -->
               </th>
               <th v-show="true" class="border bg-gray" @click="sortByAcualIn">
-                Acl_in
+                Acl_in___________
                 <p v-if="user.isSortedByActualIn" btn i-carbon-arrow-down />
                 <p v-else btn i-carbon-dot-mark />
               </th>
               <th class="border bg-gray">
-                Status
+                <!-- Status -->
               </th>
               <th class="border bg-gray" />
             </tr>
@@ -813,29 +815,35 @@ startTime()
                 <p py-1 cursor-pointer @click="() => { flight.show = !flight.show }">
                   {{ flight.airport_iata }}
                 </p>
+                <p> {{ flight.flight }} </p>
               </td>
               <td class="border">
                 <!-- w-1/3 border border-r-0 border-gray-300  p-4 font-normal sm:w-1/4 -->
-                {{ flight.flight }}
+                <!-- {{ flight.flight }} -->
               </td>
               <td class="border">
                 {{ flight.sta }}
+                {{ flight.scheduled_in }}
               </td>
               <td :class="etaTxtClass(flight)" class="border">
                 {{ flight.arr_time }}
+                {{ flight.estimated_in }}
               </td>
 
               <td class="border ">
-                {{ flight.scheduled_in }}
+                <!-- {{ flight.scheduled_in }} -->
               </td>
               <td class="border ">
-                {{ flight.estimated_in }}
+                <!-- {{ flight.estimated_in }} -->
               </td>
               <td class="border " :class="[{ ['bg-yellow-7']: ((today_date.getTime() / 1000 - flight.actual_in_unix) > 600.000) && ((today_date.getTime() / 1000 - flight.actual_in_unix) < 1200.000) }]">
                 {{ flight.actual_in }}
+                <p text-xs>
+                  {{ flight.status }}
+                </p>
               </td>
               <td class="border">
-                {{ flight.status }}
+                <!-- {{ flight.status }} -->
               </td>
               <td class="border ">
                 <p btn bg-rose i-carbon-x @click="remove_listed_flight(user.listedFlights.indexOf(flight))" />
@@ -847,13 +855,14 @@ startTime()
             </td> -->
             </tr>
             <tr>
+              <td />
               <td v-if="flight.show" class="border" colspan="6">
                 <!-- {{ flight.airport_text }} -->
                 {{ ` ${flight.airline_name} , ${flight.airport_city}, ` }}
                 <p>{{ flight.aircraft }}</p>
 
                 <!-- <p i-carbon-arrow-down /> -->
-                <p>
+                <!-- <p>
                   <button @click="update_one_flight(flight.flight, user.listedFlights.indexOf(flight)) ">
                     <p btn i-carbon-repeat-one />
                   </button>
@@ -863,41 +872,40 @@ startTime()
                   <button @click=" remove_listed_flight(user.listedFlights.indexOf(flight))">
                     <p btn bg-rose i-carbon-x />
                   </button>
-                </p>
+                </p> -->
               </td>
             </tr>
           </tbody>
-          <tr class="border">
-            <td class="border">
-              <!-- td1 -->
-            </td>
+          <!-- <tr class="border">
+            <td class="border" />
             <td class="border">
               <input v-model="user.newFlight.flight" text-black w-full class="border" placeholder="new flight: " @keydown.enter="add_to_listed_flights(user.newFlight.flight)">
             </td>
+            <td class="border" />
             <td class="border">
-              <!-- td3 -->
-            </td>
-            <td class="border">
-              <!-- td4 -->
               <button btn @click="add_to_listed_flights(user.newFlight.flight)">
                 Add
               </button>
             </td>
-            <td class="border">
-              <!-- td5 -->
-            </td>
+            <td class="border" />
           </tr>
-          <tr> &nbsp; </tr>
+          <tr> &nbsp; </tr> -->
         </table>
       </div>
-      <div py-2 />
+      <!-- <div py-2 /> -->
+      <p text-4xl>
+        {{ user.clock_txt }}
+      </p>
+      <p>
+        {{ user.message }}
+      </p>
       <button m-3 text-sm btn @click="useTimeout(aeroApiScheduled('scheduled_arrivals', 0), 1000)">
         AeroAPI
       </button>
-      <button m-3 text-sm btn @click="useTimeout(test(), 1000)">
+      <!-- <button m-3 text-sm btn @click="useTimeout(test(), 1000)">
         Test
-      </button>
-      <p>
+      </button> -->
+      <!-- <p>
         {{ user.airport_icao }}
         <input
           id="input" v-model="user.inputAirport" placeholder="enter icao code" autocomplete="true" type="text"
@@ -906,7 +914,7 @@ startTime()
         >
         <button m-3 text-sm btn @click="changeAirport">
           Change
-        </button>
+        </button> -->
 
       <!-- <button
         m-3 text-sm btn
@@ -914,15 +922,11 @@ startTime()
       >
         Test
       </button> -->
-      </p>
-      <p text-4xl>
-        {{ user.clock_txt }}
-      </p>
-      <div py-4 />
+      <!-- </p>
+      <div py-4 /> -->
       <!-- {{ user.listedFlights }} -->
       <!-- {{ filtered_flight }} -->
-      {{ user.message }}
-      <p>
+      <!-- <p>
         <select v-model="user.selectedDate">
           <option disabled="">
             Choose Date
@@ -981,20 +985,20 @@ startTime()
       >
       <button m-3 text-sm btn @click="save">
         Save
-      </button>
+      </button> -->
       <!-- <button
         m-3 text-sm btn
         @click="test"
       >
         Test
       </button> -->
-    </p>
+    <!-- </p> -->
 
-    <button m-3 text-sm btn bg-red @click="get_all_arriving_flights">
+    <!-- <button m-3 text-sm btn bg-red @click="get_all_arriving_flights">
       get all arriving flights (experimental)
-    </button>
+    </button> -->
     <!-- <div py-4 /> -->
-    <p id="message">
+    <!-- <p id="message">
       user.savedKey : {{ user.savedKey }}
     </p>
     <p id="message">
@@ -1009,17 +1013,17 @@ startTime()
     <div>
       <div>
         <!-- {{ user.int_in_flight_api }} -->
-      </div>
-      <button m-3 text-sm btn bg-red @click="change_tracked_list(user.int_in_flight_api)">
-        track generated flights (experimental)
-      </button>
-    </div>
-    <button btn @click="load_saved_listed_flights()">
-      use saved listed flights
+    <!-- </div>
+    <button m-3 text-sm btn bg-red @click="change_tracked_list(user.int_in_flight_api)">
+      track generated flights (experimental)
     </button>
-    <button btn @click="save_listed_flights()">
-      save listed flights
-    </button>
+  </div>
+  <button btn @click="load_saved_listed_flights()">
+    use saved listed flights
+  </button>
+  <button btn @click="save_listed_flights()">
+    save listed flights
+  </button> -->
     <!-- <div>
       <button m-3 text-sm btn bg-red @click="setAutoRefresh">
         set auto refresh (experimental)
@@ -1034,6 +1038,7 @@ startTime()
         Home
       </button> -->
     <!-- </div> -->
+    </div>
   </div>
 </template>
 
