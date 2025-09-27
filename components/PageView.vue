@@ -914,10 +914,8 @@ startTime()
           <option :value="4">
             4
           </option>
-          </option>
           <option :value="5">
             5
-          </option>
           </option>
           <option :value="6">
             6
@@ -999,11 +997,11 @@ startTime()
           <option :value="4">
             4
           </option>
-          </option>
+        
           <option :value="5">
             5
           </option>
-          </option>
+          
           <option :value="6">
             6
           </option>
