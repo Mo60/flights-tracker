@@ -133,7 +133,7 @@ async function aeroApiScheduled(endpiont, l) {
   const airport_icao = user.airport_icao || 'KIAH'
   const url = `/aeroapi/airports/${airport_icao}/flights/${endpiont}`
   const params = {
-    start: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), 7, 0).toISOString(),
+    start: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), user.selectedStartHour, user.selectedStartMin).toISOString(),
     end: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), 13, 0).toISOString(),
     max_pages: '1',
     url,
@@ -902,6 +902,34 @@ startTime()
       <button m-3 text-sm btn @click="useTimeout(aeroApiScheduled('scheduled_arrivals', 0), 1000)">
         AeroAPI
       </button>
+
+
+
+
+
+      <select v-model="user.selectedStartHour">
+          <option disabled="">
+            Choose Date
+          </option>
+          <option :value="11">
+            11
+          </option>
+        </select>
+
+    <select v-model="user.selectedStartMin">
+          <option disabled="">
+            Choose Date
+          </option>
+          <option :value="11">
+            0
+          </option>
+        </select>
+
+
+
+
+
+
       <!-- <button m-3 text-sm btn @click="useTimeout(test(), 1000)">
         Test
       </button> -->
