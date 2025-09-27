@@ -906,7 +906,7 @@ startTime()
 
 
 
-
+      <p>
       <select v-model="user.selectedStartHour">
           <option disabled="">
             Choose Date
@@ -924,7 +924,28 @@ startTime()
             0
           </option>
         </select>
+      </p>
 
+
+      <p>
+      <select v-model="user.selectedEndHour">
+          <option disabled="">
+            Choose Date
+          </option>
+          <option :value="11">
+            14
+          </option>
+        </select>
+
+    <select v-model="user.selectedEndMin">
+          <option disabled="">
+            Choose Date
+          </option>
+          <option :value="11">
+            0
+          </option>
+        </select>
+      </p>
 
 
 
