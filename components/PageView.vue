@@ -134,7 +134,7 @@ async function aeroApiScheduled(endpiont, l) {
   const url = `/aeroapi/airports/${airport_icao}/flights/${endpiont}`
   const params = {
     start: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), user.selectedStartHour, user.selectedStartMin).toISOString(),
-    end: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(),  22, 0).toISOString(),
+    end: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(),  user.selectedEndHour, user.selectedEndMin).toISOString(),
     max_pages: '1',
     url,
   }
@@ -906,7 +906,7 @@ startTime()
 
 
 
-      <p> Start
+      <p> Start:
       <select v-model="user.selectedStartHour">
           <option disabled="">
             Choose Date
@@ -951,7 +951,7 @@ startTime()
             16
           </option>
           <option :value="17">
-            27
+            17
           </option>
           <option :value="18">
             18
@@ -989,7 +989,7 @@ startTime()
       </p>
 
 
-      <p> End
+      <p> End :
       <select v-model="user.selectedEndHour">
           <option disabled="">
             Choose Date
@@ -1036,7 +1036,7 @@ startTime()
             16
           </option>
           <option :value="17">
-            27
+            17
           </option>
           <option :value="18">
             18
