@@ -7,6 +7,10 @@ export const useUserStore = defineStore('user', () => {
   const newFlight = ref({
     flight: '',
   })
+  const selectedStartHour = ref('')
+  const selectedStartMin = ref('')
+  const selectedEndHour = ref('')
+  const selectedEndMin = ref('')
   const inputAirport = ref('')
   const airport_icao = ref('KIAH')
   const savedListedFlights = ref([])
@@ -50,6 +54,10 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return {
+    selectedStartHour,
+    selectedStartMin,
+    selectedEndHour,
+    selectedEndMin,
     setNewName,
     otherNames,
     message,
