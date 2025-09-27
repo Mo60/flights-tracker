@@ -133,8 +133,8 @@ async function aeroApiScheduled(endpiont, l) {
   const airport_icao = user.airport_icao || 'KIAH'
   const url = `/aeroapi/airports/${airport_icao}/flights/${endpiont}`
   const params = {
-    start: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), 11, 30).toISOString(),
-    end: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), 22, 0).toISOString(),
+    start: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), 7, 0).toISOString(),
+    end: new Date(user.selectedDate.getFullYear(), user.selectedDate.getMonth(), user.selectedDate.getDate(), 13, 0).toISOString(),
     max_pages: '1',
     url,
   }
