@@ -216,6 +216,7 @@ function save_listed_flights() {
 }
 
 function remove_listed_flight(flight) {
+  listedFlightsMap.delete(flight.flight)
   user.listedFlights.splice(flight, 1)
   localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
 }
@@ -1015,6 +1016,9 @@ startTime()
           <option :value="15">
             15
           </option>
+          <option :value="30">
+            30
+          </option>
           <option :value="45">
             45
           </option>
@@ -1086,6 +1090,9 @@ startTime()
           </option>
           <option :value="22">
             22
+          </option>
+          <option :value="22">
+            23
           </option>
         </select>
 
