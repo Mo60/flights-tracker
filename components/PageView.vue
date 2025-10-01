@@ -22,6 +22,14 @@ const date_formated = `${year}-${month}-${day}`
 const user = useUserStore()
 user.selectedDate = new Date(year, month - 1, day_number)
 
+user.selectedStartHour = today_date.getHours() -1 
+user.selectedStartMin = 0
+user.selectedEndHour = today_date.getHours() + 1
+user.selectedEndMin = 0
+
+
+
+
 if (localStorage.getItem('airport_icao'))
   user.airport_icao = localStorage.getItem('airport_icao')
 
@@ -68,6 +76,8 @@ const router = useRouter()
 //   user.message = user.message.concat(['', clientXS, clientXE, changeX, fl.flight, this.fl])
 // }
 
+const listedFlightsMap = new Map(user.listedFlights.map(flight => [flight.flight , flight]))
+// console.log(listedFlightsMap)
 // ----------------------------------
 async function test() {
 
@@ -77,6 +87,24 @@ async function filterFlights(flights) {
   return await flights.filter(item => !(item.origin.code_icao[0] === 'K' || item.origin.code_icao[0] === 'C'))
   // || item.flight.airport.origin.position.country.code === 'CA')
 }
+
+function listedFlightsIsNotSorted (){
+  user.isSortedBySTA = false
+  user.isSortedByETA = false
+  user.isSortedByActualIn = false
+}
+
+function clearListedFlight(){
+  listedFlightsMap.clear()
+   user.listedFlights = [{
+        flight: 'Clock: ',
+        eta_unix: Math.round(today_date.getTime() / 1000),
+        sta_unix: Math.round(today_date.getTime() / 1000),
+        status: user.clock_txt,
+      }]
+  // console.log(listedFlightsMap)
+}
+
 
 async function getNextPageAeroApi(url, response, params, i, endpiont, l) {
   if (i < 100 && response.links) {
@@ -99,11 +127,8 @@ async function getNextPageAeroApi(url, response, params, i, endpiont, l) {
 async function pushFlightsFromAeroApi(results) {
   const flights = await filterFlights(results)
   // const flights = await results
-  flights.forEach((element) => {
-    // console.log(element)
-    user.int_in_flight_api.push(element.ident_iata)
-    user.listedFlights.push({
-      airport_iata: element.origin.code_iata,
+  flights.forEach((element) => { 
+     listedFlightsMap.set(element.ident_iata ?? element.registration, {  airport_iata: element.origin.code_iata,
       flight: element.ident_iata ?? element.registration,
       arr_time: new Date(element.estimated_on).toTimeString().split(' ')[0].slice(0, 5),
       status: element.status,
@@ -115,20 +140,26 @@ async function pushFlightsFromAeroApi(results) {
       airline_name: element.operator ?? '__',
       airport_city: element.origin.city || '',
       scheduled_in: new Date(element.scheduled_in).toTimeString().split(' ')[0].slice(0, 5),
+      scheduled_in_string: new Date(element.estimated_in).toDateString(),
       estimated_in: new Date(element.estimated_in).toTimeString().split(' ')[0].slice(0, 5),
       ...(element.actual_in && { actual_in: new Date(element.actual_in).toTimeString().split(' ')[0].slice(0, 5) }),
       scheduled_in_unix: new Date(element.scheduled_in).getTime() / 1000,
       estimated_in_unix: new Date(element.estimated_in).getTime() / 1000,
-      ...(element.actual_in && { actual_in_unix: new Date(element.actual_in).getTime() / 1000 }),
-    })
+      ...(element.actual_in && { actual_in_unix: new Date(element.actual_in).getTime() / 1000 }),}) 
+
   })
+  // flights.forEach((element) => {
+  //   
+  //   user.int_in_flight_api.push(element.ident_iata)
+  
+  listedFlightsIsNotSorted ()
+  user.listedFlights = [...listedFlightsMap.values()]
+  sortBySTA()
   localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
 }
 
 async function aeroApiScheduled(endpiont, l) {
-  user.isSortedBySTA = false
-  user.isSortedByETA = false
-  user.isSortedByActualIn = false
+  listedFlightsIsNotSorted()
   user.message = `getting ${endpiont} ....`
   const airport_icao = user.airport_icao || 'KIAH'
   const url = `/aeroapi/airports/${airport_icao}/flights/${endpiont}`
@@ -144,22 +175,18 @@ async function aeroApiScheduled(endpiont, l) {
     // console.log(response)
     // console.log(response.data.scheduled_arrivals[0].estimated_on.split('T')[1])
     // console.log(response.data.scheduled_arrivals.length)
-    if (l === 0) {
-      user.listedFlights = [{
-        flight: 'Clock: ',
-        eta_unix: Math.round(today_date.getTime() / 1000),
-        sta_unix: Math.round(today_date.getTime() / 1000),
-        status: user.clock_txt,
-      }]
-    }
+    // if (l === 0) {
+    //   clearListedFlight()
+    // }
 
     // console.log(response)
 
     await pushFlightsFromAeroApi(response[endpiont])
 
     await getNextPageAeroApi (url, response, params, 2, endpiont, l)
-
-    user.message = 'Done!'
+    
+    
+    // user.message = 'Still Working!!'
   }
   catch (error) {
     // console.log(error)
@@ -194,9 +221,7 @@ function remove_listed_flight(flight) {
 }
 
 async function update_listed_flights() {
-  user.isSortedBySTA = false
-  user.isSortedByETA = false
-  user.isSortedByActualIn = false
+  listedFlightsIsNotSorted()
 
   user.message = `last updated: ${today_date.toLocaleString()}`
   localStorage.setItem('last_updated', user.message)
@@ -428,9 +453,7 @@ function STA_time2(flight) {
 }
 
 async function go() {
-  user.isSortedBySTA = false
-  user.isSortedByETA = false
-  user.isSortedByActualIn = false
+  listedFlightsIsNotSorted()
   user.listedFlights = []
   for (let i = 0; i < user.trackedFlights.length; i++) {
     if (user.trackedFlights[i].toLowerCase() === 'clock') {
@@ -723,23 +746,29 @@ startTime()
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
     <p cursor-pointer text-blue @click="showVersionMessage">
-      V 0.3.0.1
+      V 0.3.1.0
     </p>
     <div
       v-show="user.showVersionMessage" color-black style="transition: width 4s;"
       class="bg-yellow-100 p-4 m-auto w-3/4"
     >
+      <p> V 0.3.1.0 </p>
+      <p> &nearr; added clear button to clear listed flight</p>   
+      <p> &nearr; Updating flights will not delete flights list</p> 
+      <p> &nearr; flights will be sorted by STA when Updating </p> 
+      <p> &nearr; added date range </p> 
+      <p> &nearr; user should delete old flights manualy </p> 
+      <p> &nearr;  </p>    
       <p> V 0.3.0.1 </p>
       <p> &nearr; UI changes and changes time format </p>
 
-      <p> V 0.3.0.0 </p>
+      <!-- <p> V 0.3.0.0 </p>
       <p> &nearr; only AeroAPI button works as it is</p>
       <p> &nearr; now using AeroAPI from flightAware </p>
       <p>
         &nearr; it is still possible to use olg function but user has to
         provide own rapid api key
-      </p>
-      <p> &nearr; </p>
+      </p> -->
       <!-- <p> v 0.2.1.1 </p>
       <p> &nearr;fixed default access key </p>
       <p> v 0.1.10.2 </p>
@@ -859,7 +888,7 @@ startTime()
               <td v-if="flight.show" class="border" colspan="6">
                 <!-- {{ flight.airport_text }} -->
                 {{ ` ${flight.airline_name} , ${flight.airport_city}, ` }}
-                <p>{{ flight.aircraft }}</p>
+                <p>{{ flight.aircraft }} , {{ flight.scheduled_in_string }} </p>
 
                 <!-- <p i-carbon-arrow-down /> -->
                 <!-- <p>
@@ -901,6 +930,9 @@ startTime()
       </p>
       <button m-3 text-sm btn @click="useTimeout(aeroApiScheduled('scheduled_arrivals', 0), 1000)">
         AeroAPI
+      </button>
+      <button m-3 text-sm btn @click="clearListedFlight()">
+        Clear
       </button>
 
 
