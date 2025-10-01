@@ -216,7 +216,7 @@ function save_listed_flights() {
 }
 
 function remove_listed_flight(flight) {
-  listedFlightsMap.delete(flight.flight)
+  listedFlightsMap.delete(user.listedFlights[flight].flight)
   user.listedFlights.splice(flight, 1)
   localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
 }
