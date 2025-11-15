@@ -27,9 +27,6 @@ user.selectedStartMin = 0
 user.selectedEndHour = today_date.getHours() + 1
 user.selectedEndMin = 0
 
-
-
-
 if (localStorage.getItem('airport_icao'))
   user.airport_icao = localStorage.getItem('airport_icao')
 
@@ -111,7 +108,6 @@ function clearListedFlight() {
   // console.log(listedFlightsMap)
 }
 
-
 async function getNextPageAeroApi(url, response, params, i, endpiont, l) {
   if (i < 100 && response.links) {
     console.log(`get page ${i}`)
@@ -154,20 +150,32 @@ async function pushFlightsFromAeroApi(results) {
       estimated_in_unix: new Date(element.estimated_in).getTime() / 1000,
       ...(element.actual_in && { actual_in_unix: new Date(element.actual_in).getTime() / 1000 }),
     })
-
   })
   // flights.forEach((element) => {
-  //   
+  //
   //   user.int_in_flight_api.push(element.ident_iata)
 
-  listedFlightsIsNotSorted()
+  // listedFlightsIsNotSorted()
   user.listedFlights = [...listedFlightsMap.values()]
-  sortBySTA()
+  if (user.isSortedBySTA) {
+    listedFlightsIsNotSorted()
+    sortBySTA()
+  }
+  if (user.isSortedByETA) {
+    listedFlightsIsNotSorted()
+    sortByETA()
+  }
+  if (user.isSortedByActualIn) {
+    listedFlightsIsNotSorted()
+    sortBySTA()
+    sortByAcualIn()
+  }
+
   localStorage.setItem('listed_flights', JSON.stringify(user.listedFlights))
 }
 
 async function aeroApiScheduled(endpiont, l) {
-  listedFlightsIsNotSorted()
+  // listedFlightsIsNotSorted()
   user.message = `getting ${endpiont} ....`
   const airport_icao = user.airport_icao || 'KIAH'
   const url = `/aeroapi/airports/${airport_icao}/flights/${endpiont}`
@@ -192,7 +200,6 @@ async function aeroApiScheduled(endpiont, l) {
     await pushFlightsFromAeroApi(response[endpiont])
 
     await getNextPageAeroApi(url, response, params, 2, endpiont, l)
-
 
     // user.message = 'Still Working!!'
   }
@@ -697,8 +704,8 @@ function startTime() {
   user.listedFlights.forEach((item, index) => {
     // console.log(item.flight)
     if (item.flight === 'Clock: ')
-      // user.listedFlights[index].status = user.clock_txt
-      // = { flight: 'Clock: ', eta_unix: today_date.getTime() / 1000, sta_unix: today_date.getTime() / 1000, status: user.clock_txt }
+    // user.listedFlights[index].status = user.clock_txt
+    // = { flight: 'Clock: ', eta_unix: today_date.getTime() / 1000, sta_unix: today_date.getTime() / 1000, status: user.clock_txt }
 
       user.listedFlights[index] = { flight: 'Clock: ', eta_unix: Math.round(today_date.getTime() / 1000), sta_unix: Math.round(today_date.getTime() / 1000), status: user.clock_txt }
   })
@@ -755,14 +762,17 @@ startTime()
       <!-- <em text-sm opacity-75>{{ t('intro.desc') }}</em> -->
     </p>
     <p cursor-pointer text-blue @click="showVersionMessage">
-      V 0.3.1.0
+      V 0.3.1.1
     </p>
-    <div v-show="user.showVersionMessage" color-black style="transition: width 4s;"
-      class="bg-yellow-100 p-4 m-auto w-3/4">
-      <p> V 0.3.1.0 </p>
+    <div
+      v-show="user.showVersionMessage" color-black style="transition: width 4s;"
+      class="m-auto w-3/4 bg-yellow-100 p-4"
+    >
+      <p> V 0.3.1.1 </p>
+      <p> &nearr; flights will be sorted by whateverthe user sorted them when Updating </p>
       <p> &nearr; added clear button to clear listed flight</p>
       <p> &nearr; Updating flights will not delete flights list</p>
-      <p> &nearr; flights will be sorted by STA when Updating </p>
+      <!-- <p> &nearr; flights will be sorted by STA when Updating </p> -->
       <p> &nearr; added date range </p>
       <p> &nearr; user should delete old flights manualy </p>
       <p> &nearr; </p>
@@ -805,10 +815,10 @@ startTime()
     <!-- {{ typeof day }} -->
 
     <div>
-      <div max-h-lg overflow-auto m-5>
-        <table class=" m-auto border ">
+      <div m-5 max-h-lg overflow-auto>
+        <table class="m-auto border">
           <!-- m-auto  rounded shadow-md"> -->
-          <thead top-0px position-sticky>
+          <thead position-sticky top-0px>
             <tr>
               <th class="border bg-gray">
                 <p i-carbon-departure />
@@ -816,15 +826,15 @@ startTime()
               <th class="border border-gray-300 bg-gray">
                 <!-- Flight -->
               </th>
-              <th class="border bg-gray " @click="sortBySTA">
+              <th class="border bg-gray" @click="sortBySTA">
                 STA
-                <p v-if="user.isSortedBySTA" btn i-carbon-arrow-down />
-                <p v-else btn i-carbon-dot-mark />
+                <p v-if="user.isSortedBySTA" i-carbon-arrow-down btn />
+                <p v-else i-carbon-dot-mark btn />
               </th>
-              <th class="border bg-gray " @click="sortByETA">
+              <th class="border bg-gray" @click="sortByETA">
                 ETA
-                <p v-if="user.isSortedByETA" btn i-carbon-arrow-down />
-                <p v-else btn i-carbon-dot-mark />
+                <p v-if="user.isSortedByETA" i-carbon-arrow-down btn />
+                <p v-else i-carbon-dot-mark btn />
               </th>
 
               <th v-show="true" class="border bg-gray">
@@ -835,8 +845,8 @@ startTime()
               </th>
               <th v-show="true" class="border bg-gray" @click="sortByAcualIn">
                 Acl_in___________
-                <p v-if="user.isSortedByActualIn" btn i-carbon-arrow-down />
-                <p v-else btn i-carbon-dot-mark />
+                <p v-if="user.isSortedByActualIn" i-carbon-arrow-down btn />
+                <p v-else i-carbon-dot-mark btn />
               </th>
               <th class="border bg-gray">
                 <!-- Status -->
@@ -847,10 +857,13 @@ startTime()
           <!-- use the filtered list -->
           <tbody v-for="flight in user.listedFlights" :key="flight._id">
             <tr
-              :class="[{ ['text-sky-600 dark:text-sky-500']: ((today_date.getTime() / 1000 - flight.actual_in_unix) > 1200.000) }]">
-              <td class="border"
-                :class="[{ ['bg-yellow-7']: Math.abs(flight.eta_unix - today_date.getTime() / 1000) < 3600.000 }]">
-                <p py-1 cursor-pointer @click="() => { flight.show = !flight.show }">
+              :class="[{ ['text-sky-600 dark:text-sky-500']: ((today_date.getTime() / 1000 - flight.actual_in_unix) > 1200.000) }]"
+            >
+              <td
+                class="border"
+                :class="[{ ['bg-yellow-7']: Math.abs(flight.eta_unix - today_date.getTime() / 1000) < 3600.000 }]"
+              >
+                <p cursor-pointer py-1 @click="() => { flight.show = !flight.show }">
                   {{ flight.airport_iata }}
                 </p>
                 <p> {{ flight.flight }} </p>
@@ -868,14 +881,16 @@ startTime()
                 {{ flight.estimated_in }}
               </td>
 
-              <td class="border ">
+              <td class="border">
                 <!-- {{ flight.scheduled_in }} -->
               </td>
-              <td class="border ">
+              <td class="border">
                 <!-- {{ flight.estimated_in }} -->
               </td>
-              <td class="border "
-                :class="[{ ['bg-yellow-7']: ((today_date.getTime() / 1000 - flight.actual_in_unix) > 600.000) && ((today_date.getTime() / 1000 - flight.actual_in_unix) < 1200.000) }]">
+              <td
+                class="border"
+                :class="[{ ['bg-yellow-7']: ((today_date.getTime() / 1000 - flight.actual_in_unix) > 600.000) && ((today_date.getTime() / 1000 - flight.actual_in_unix) < 1200.000) }]"
+              >
                 {{ flight.actual_in }}
                 <p text-xs>
                   {{ flight.status }}
@@ -884,8 +899,8 @@ startTime()
               <td class="border">
                 <!-- {{ flight.status }} -->
               </td>
-              <td class="border ">
-                <p btn bg-rose i-carbon-x @click="remove_listed_flight(user.listedFlights.indexOf(flight))" />
+              <td class="border">
+                <p i-carbon-x bg-rose btn @click="remove_listed_flight(user.listedFlights.indexOf(flight))" />
                 <!-- {{ user.listedFlights.indexOf(flight) }} -->
               </td>
 
@@ -945,10 +960,8 @@ startTime()
         Clear
       </button>
 
-
-
-
-      <p> Start:
+      <p>
+        Start:
         <select v-model="user.selectedStartHour">
           <!--    <option disabled="">
             Choose Date
@@ -1011,7 +1024,6 @@ startTime()
           <option :value="22">
             22
           </option>
-
         </select>
 
         <select v-model="user.selectedStartMin">
@@ -1031,12 +1043,11 @@ startTime()
           <option :value="45">
             45
           </option>
-
         </select>
       </p>
 
-
-      <p> End :
+      <p>
+        End :
         <select v-model="user.selectedEndHour">
           <!--    <option disabled="">
             Choose Date
@@ -1125,23 +1136,21 @@ startTime()
         </select>
       </p>
 
-
-
-
-
       <!-- <button m-3 text-sm btn @click="useTimeout(test(), 1000)">
         Test
       </button> -->
 
       {{ user.airport_icao }}
-      <input id="input" v-model="user.inputAirport" placeholder="enter icao code" autocomplete="true" type="text"
+      <input
+        id="input" v-model="user.inputAirport" placeholder="enter icao code" autocomplete="true" type="text"
         v-bind="$attrs" p="x-4 y-2" w="150px" text="center" bg="transparent" border="~ rounded gray-200 dark:gray-700"
-        outline="none active:none" @keydown.enter="changeAirport">
+        outline="none active:none" @keydown.enter="changeAirport"
+      >
       <button m-3 text-sm btn @click="changeAirport">
         Change
       </button>
 
-      <!-- 
+      <!--
         <p>
         <button
         m-3 text-sm btn
